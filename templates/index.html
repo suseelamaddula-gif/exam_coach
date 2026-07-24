@@ -1,0 +1,4275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartPrep AI — Premium AI Exam Prep Coach</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --font-family: 'Inter', sans-serif;
+      --font-heading: 'Outfit', sans-serif;
+
+      /* Colors - Light Mode (Blue, White, Purple) */
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-sidebar: #0f172a;
+      --sidebar-text: #94a3b8;
+      --sidebar-active-bg: rgba(99, 102, 241, 0.15);
+      --sidebar-active-text: #a5b4fc;
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-light: #94a3b8;
+
+      --accent: #4f46e5;
+      --accent-hover: #4338ca;
+      --accent-light: rgba(99, 102, 241, 0.1);
+
+      --purple: #8b5cf6;
+      --purple-light: #f5f3ff;
+      --purple-border: #ddd6fe;
+
+      --blue: #3b82f6;
+      --blue-light: #eff6ff;
+
+      --green: #10b981;
+      --green-light: #ecfdf5;
+
+      --border: #e2e8f0;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --card-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+      --sidebar-width: 260px;
+      --sidebar-collapsed-width: 78px;
+      --topbar-height: 70px;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      /* Colors - Dark Mode */
+      --bg-primary: #0b0f19;
+      --bg-secondary: #121826;
+      --bg-sidebar: #070a12;
+      --sidebar-text: #64748b;
+      --sidebar-active-bg: rgba(139, 92, 246, 0.15);
+      --sidebar-active-text: #c084fc;
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-light: #64748b;
+
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-light: rgba(99, 102, 241, 0.15);
+
+      --purple: #a78bfa;
+      --purple-light: #1e1b4b;
+      --purple-border: #312e81;
+
+      --blue: #60a5fa;
+      --blue-light: #1e3a8a;
+
+      --green: #34d399;
+      --green-light: #064e3b;
+
+      --border: #1e293b;
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+      --card-shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      outline: none;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      transition: var(--transition);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: var(--font-heading);
+      font-weight: 700;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* App Layout Container */
+    .app-container {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      color: #ffffff;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      overflow: hidden;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-brand {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      white-space: nowrap;
+    }
+
+    .sidebar-brand i {
+      font-size: 1.8rem;
+      color: var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-brand-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-family: var(--font-heading);
+      background: linear-gradient(135deg, #ffffff, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar.collapsed .sidebar-brand-name {
+      display: none;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      padding: 20px 12px;
+      list-style-type: none;
+      overflow-y: auto;
+    }
+
+    .sidebar-menu::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-menu::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+
+    .sidebar-item {
+      margin-bottom: 6px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      color: var(--sidebar-text);
+      border-radius: var(--radius-sm);
+      gap: 14px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .sidebar-link:hover {
+      color: #ffffff;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-item.active .sidebar-link {
+      background-color: var(--sidebar-active-bg);
+      color: var(--sidebar-active-text);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .sidebar-link i {
+      font-size: 1.15rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar.collapsed .sidebar-link span {
+      display: none;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .sidebar-footer-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: bold;
+      font-family: var(--font-heading);
+    }
+
+    .sidebar-footer-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-footer-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .sidebar-footer-role {
+      font-size: 0.75rem;
+      color: var(--sidebar-text);
+    }
+
+    .sidebar.collapsed .sidebar-footer-info {
+      display: none;
+    }
+
+    /* Main Content Wrapper */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+
+    .sidebar.collapsed+.main-wrapper {
+      margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      height: var(--topbar-height);
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      transition: var(--transition);
+    }
+
+    .top-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .sidebar-toggle-btn {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .global-search-container {
+      position: relative;
+      width: 300px;
+    }
+
+    .global-search-container i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+
+    .global-search-input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    .global-search-input:focus {
+      border-color: var(--accent);
+      background-color: var(--bg-secondary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .top-nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-action-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background-color: var(--bg-secondary);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .nav-action-btn:hover {
+      background-color: var(--bg-primary);
+      color: var(--accent);
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg-secondary);
+    }
+
+    .nav-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 4px 12px 4px 4px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+
+    .nav-profile:hover {
+      background-color: var(--bg-primary);
+    }
+
+    .nav-profile-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .nav-profile-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Content Panel Layout */
+    .content-container {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    /* Page View Manager */
+    .page-view {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .page-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* General Card & Grid Layouts */
+    .card {
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+      transition: var(--transition);
+    }
+
+    .card:hover {
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title i {
+      color: var(--accent);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    /* UI Interactive Controls */
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      margin-top: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      background-color: var(--bg-secondary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn:hover {
+      background-color: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: var(--purple-light);
+      color: var(--purple);
+      border: 1px solid var(--purple-border);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--purple);
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+    }
+
+    /* ========================================= */
+    /* 1. DASHBOARD COMPONENT STYLING             */
+    /* ========================================= */
+    .dashboard-header-banner {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 30px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-header-banner::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 80%);
+      top: -50px;
+      right: -50px;
+      border-radius: 50%;
+    }
+
+    .dashboard-banner-title {
+      font-size: 2.2rem;
+      font-family: var(--font-heading);
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .dashboard-banner-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .dashboard-stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .dashboard-stat-card {
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow);
+      padding: 20px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .dashboard-stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .dashboard-stat-card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      display: inline-block;
+      padding: 10px;
+      border-radius: 50%;
+    }
+
+    .dashboard-stat-card-icon.blue {
+      background-color: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .dashboard-stat-card-icon.purple {
+      background-color: var(--purple-light);
+      color: var(--purple);
+    }
+
+    .dashboard-stat-card-icon.green {
+      background-color: var(--green-light);
+      color: var(--green);
+    }
+
+    .dashboard-stat-card-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .dashboard-stat-card-lbl {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .circular-progress-widget {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+    }
+
+    .circular-progress-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, var(--bg-secondary) 79%, transparent 80% 100%),
+        conic-gradient(var(--accent) calc(var(--percent) * 1%), var(--border) 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      font-family: var(--font-heading);
+    }
+
+    .circular-progress-info {
+      flex: 1;
+    }
+
+    .circular-progress-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .circular-progress-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .recommendation-alert {
+      background-color: var(--purple-light);
+      border-left: 4px solid var(--purple);
+      padding: 16px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+
+    .recent-activity-list {
+      list-style-type: none;
+    }
+
+    .recent-activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .recent-activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .recent-activity-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      margin-top: 6px;
+    }
+
+    .recent-activity-content {
+      flex: 1;
+    }
+
+    .recent-activity-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .recent-activity-time {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    /* ========================================= */
+    /* 2. STUDY PLANNER COMPONENT STYLING         */
+    /* ========================================= */
+    .planner-tabs {
+      display: flex;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .planner-tab-btn {
+      padding: 12px 20px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .planner-tab-btn:hover {
+      color: var(--accent);
+    }
+
+    .planner-tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .planner-tab-content {
+      display: none;
+    }
+
+    .planner-tab-content.active {
+      display: block;
+    }
+
+    /* Calendar View */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .calendar-cell {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      min-height: 100px;
+      padding: 8px;
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .calendar-cell:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .calendar-cell.today {
+      border: 2px solid var(--accent);
+      background-color: var(--accent-light);
+    }
+
+    .calendar-cell-date {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .calendar-task-tag {
+      font-size: 0.7rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background-color: var(--blue-light);
+      color: var(--blue);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .calendar-task-tag.completed {
+      background-color: var(--green-light);
+      color: var(--green);
+      text-decoration: line-through;
+    }
+
+    .calendar-task-tag.revision {
+      background-color: var(--purple-light);
+      color: var(--purple);
+    }
+
+    .calendar-task-tag.mock {
+      background-color: #fef3c7;
+      color: #d97706;
+    }
+
+    .calendar-task-tag.break {
+      background-color: #f3f4f6;
+      color: #6b7280;
+    }
+
+    /* Output markdown formatting helper */
+    .markdown-output table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    .markdown-output th,
+    .markdown-output td {
+      border: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .markdown-output th {
+      background-color: var(--accent);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .markdown-output tr:nth-child(even) {
+      background-color: var(--bg-primary);
+    }
+
+    /* List view tasks checklist */
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .checklist-item:hover {
+      background-color: var(--bg-primary);
+    }
+
+    .checklist-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .checklist-item-content {
+      flex: 1;
+    }
+
+    .checklist-item-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .checklist-item-title.completed {
+      text-decoration: line-through;
+      color: var(--text-light);
+    }
+
+    .checklist-item-meta {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    /* ========================================= */
+    /* 3. AI TUTOR & CHATBOX COMPONENT STYLING   */
+    /* ========================================= */
+    .chat-box {
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-primary);
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-msg {
+      max-width: 80%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+    }
+
+    .chat-msg.assistant {
+      align-self: flex-start;
+    }
+
+    .chat-bubble {
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .chat-msg.user .chat-bubble {
+      background-color: var(--accent);
+      color: #ffffff;
+      border-bottom-right-radius: 2px;
+    }
+
+    .chat-msg.assistant .chat-bubble {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border-bottom-left-radius: 2px;
+      border: 1px solid var(--border);
+    }
+
+    .chat-meta {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    .chat-msg.user .chat-meta {
+      text-align: right;
+    }
+
+    .chat-input-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input-bar input {
+      flex: 1;
+      border-radius: var(--radius-lg);
+    }
+
+    .chat-input-bar button {
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    /* Inline video recommendation panel */
+    .inline-videos-panel {
+      margin-top: 14px;
+      border-top: 1px dashed var(--border);
+      padding-top: 14px;
+    }
+
+    .inline-videos-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--purple);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .inline-videos-list {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .inline-videos-list::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .inline-videos-list::-webkit-scrollbar-thumb {
+      background-color: var(--border);
+      border-radius: 4px;
+    }
+
+    .inline-video-card {
+      flex: 0 0 240px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+    }
+
+    .inline-video-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--purple);
+    }
+
+    .inline-video-thumb {
+      width: 100%;
+      height: 120px;
+      background-size: cover;
+      background-position: center;
+      background-color: #000;
+      position: relative;
+    }
+
+    .inline-video-duration {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+
+    .inline-video-info {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .inline-video-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 32px;
+      margin-bottom: 6px;
+    }
+
+    .inline-video-channel {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .inline-video-actions {
+      display: flex;
+      gap: 4px;
+      margin-top: auto;
+    }
+
+    .inline-video-actions a,
+    .inline-video-actions button {
+      flex: 1;
+      text-align: center;
+      padding: 6px 0;
+      font-size: 0.7rem;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ========================================= */
+    /* 4. VIDEO LEARNING STYLING                 */
+    /* ========================================= */
+    .video-search-strip {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .video-search-input-group {
+      flex: 1;
+      position: relative;
+    }
+
+    .video-search-input-group input {
+      padding-left: 45px;
+      border-radius: var(--radius-lg);
+    }
+
+    .video-search-input-group i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+
+    .search-history-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .search-history-lbl {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .search-tag {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: var(--radius-lg);
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+    }
+
+    .search-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .search-tag-remove {
+      color: var(--text-light);
+      cursor: pointer;
+    }
+
+    .search-tag-remove:hover {
+      color: #ef4444;
+    }
+
+    .clear-history-btn {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-weight: 500;
+    }
+
+    .clear-history-btn:hover {
+      color: #ef4444;
+    }
+
+    /* Video Learning Big Cards Grid */
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .video-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+    }
+
+    .video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .video-thumb {
+      width: 100%;
+      height: 160px;
+      background-size: cover;
+      background-position: center;
+      background-color: #000;
+      position: relative;
+    }
+
+    .video-thumb-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-color: rgba(239, 68, 68, 0.9);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .video-card:hover .video-thumb-play {
+      opacity: 1;
+    }
+
+    .video-details {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .video-card-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 38px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .video-card-meta {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .video-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      height: 36px;
+    }
+
+    .video-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .video-card-btn-watch {
+      flex: 1;
+    }
+
+    .video-card-btn-icon {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      cursor: pointer;
+      background-color: transparent;
+      transition: var(--transition);
+    }
+
+    .video-card-btn-icon:hover {
+      color: var(--accent);
+      background-color: var(--bg-primary);
+      border-color: var(--accent);
+    }
+
+    .video-card-btn-icon.active {
+      color: #ffffff;
+      background-color: var(--purple);
+      border-color: var(--purple);
+    }
+
+    /* ========================================= */
+    /* 5. MOCK TEST STYLING                      */
+    /* ========================================= */
+    .quiz-constructor {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .quiz-session {
+      display: none;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .quiz-session.active {
+      display: block;
+    }
+
+    .quiz-header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+
+    .quiz-timer {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      color: #ef4444;
+    }
+
+    .quiz-question-container {
+      margin-bottom: 30px;
+    }
+
+    .quiz-question-num {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .quiz-question-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .quiz-options-list {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quiz-option-card {
+      border: 1px solid var(--border);
+      background-color: var(--bg-primary);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quiz-option-card:hover {
+      border-color: var(--accent);
+      background-color: var(--bg-secondary);
+    }
+
+    .quiz-option-card.selected {
+      border-color: var(--accent);
+      background-color: var(--accent-light);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    /* Evaluator feedback page styles */
+    .review-score-container {
+      text-align: center;
+      padding: 30px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 30px;
+    }
+
+    .review-score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: var(--accent-light);
+      color: var(--accent);
+      font-size: 2.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-family: var(--font-heading);
+      border: 4px solid var(--accent);
+    }
+
+    .feedback-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 16px;
+      background-color: var(--bg-primary);
+    }
+
+    .feedback-item.correct {
+      border-left: 5px solid var(--green);
+    }
+
+    .feedback-item.incorrect {
+      border-left: 5px solid #ef4444;
+    }
+
+    .feedback-item.partial {
+      border-left: 5px solid #f59e0b;
+    }
+
+    /* ========================================= */
+    /* 6. FLASHCARDS STYLING                     */
+    /* ========================================= */
+    .flashcard-deck-layout {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .flashcard-stage {
+      perspective: 1000px;
+      margin-bottom: 30px;
+      cursor: pointer;
+    }
+
+    .flashcard {
+      height: 380px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      box-shadow: var(--card-shadow);
+      border-radius: var(--radius-lg);
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: var(--bg-secondary);
+    }
+
+    .flashcard-front {
+      z-index: 2;
+      text-align: center;
+      background: linear-gradient(135deg, var(--bg-secondary), var(--purple-light));
+    }
+
+    .flashcard-back {
+      transform: rotateY(180deg);
+      overflow-y: auto;
+    }
+
+    .flashcard-lbl {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    .flashcard-q-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.4;
+      color: var(--text-primary);
+    }
+
+    .flashcard-ans-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .flashcard-details-row {
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .flashcard-deck-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    /* ========================================= */
+    /* 7. PROGRESS / ANALYTICS STYLING           */
+    /* ========================================= */
+    .heatmap-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 20px;
+    }
+
+    .heatmap-cell {
+      aspect-ratio: 1;
+      background-color: var(--border);
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .heatmap-cell.level-1 {
+      background-color: #d8b4fe;
+    }
+
+    .heatmap-cell.level-2 {
+      background-color: #a78bfa;
+    }
+
+    .heatmap-cell.level-3 {
+      background-color: #818cf8;
+    }
+
+    .heatmap-cell.level-4 {
+      background-color: #4f46e5;
+    }
+
+    /* Skeletons Loader */
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--bg-primary) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: loadingSkeleton 1.5s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    @keyframes loadingSkeleton {
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    .skeleton-title {
+      height: 24px;
+      width: 60%;
+      margin-bottom: 12px;
+    }
+
+    .skeleton-desc {
+      height: 16px;
+      width: 80%;
+      margin-bottom: 8px;
+    }
+
+    .skeleton-thumb {
+      height: 160px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    /* Empty State styling */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-light);
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      color: var(--border);
+    }
+
+    .empty-state-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-state-desc {
+      font-size: 0.9rem;
+      max-width: 400px;
+      margin: 0 auto 20px;
+    }
+
+    /* Toast Notification system styles */
+    .toast-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease-out forwards;
+      min-width: 280px;
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--green);
+    }
+
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+
+    .toast.info {
+      border-left: 4px solid var(--blue);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Search Overlay Modal */
+    .search-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: flex;
+      justify-content: center;
+      padding-top: 100px;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .search-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .search-modal {
+      width: 90%;
+      max-width: 600px;
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--card-shadow-hover);
+      display: flex;
+      flex-direction: column;
+      max-height: 70vh;
+      animation: modalSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes modalSlide {
+      from {
+        transform: translateY(-30px);
+      }
+
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .search-modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-modal-results {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .search-result-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+    }
+
+    .search-result-item:hover {
+      background-color: var(--bg-primary);
+    }
+
+    .search-result-category {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--purple);
+      margin-bottom: 4px;
+    }
+
+    .search-result-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .search-result-desc {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- ========================================= -->
+    <!-- SIDEBAR MENU                              -->
+    <!-- ========================================= -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span class="sidebar-brand-name">SmartPrep AI</span>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="sidebar-item active" onclick="switchPage('dashboard')">
+          <a class="sidebar-link"><i class="fa-solid fa-house"></i><span>Dashboard</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('planner')">
+          <a class="sidebar-link"><i class="fa-solid fa-calendar-days"></i><span>Study Planner</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('tutor')">
+          <a class="sidebar-link"><i class="fa-solid fa-robot"></i><span>AI Tutor</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('videos')">
+          <a class="sidebar-link"><i class="fa-solid fa-video"></i><span>Video Learning</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('mock-tests')">
+          <a class="sidebar-link"><i class="fa-solid fa-file-signature"></i><span>Mock Tests</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('flashcards')">
+          <a class="sidebar-link"><i class="fa-solid fa-brain"></i><span>Flashcards</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('progress')">
+          <a class="sidebar-link"><i class="fa-solid fa-chart-line"></i><span>Progress</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('notifications')">
+          <a class="sidebar-link"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('settings')">
+          <a class="sidebar-link"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+        </li>
+        <li class="sidebar-item" onclick="switchPage('profile')">
+          <a class="sidebar-link"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-avatar" id="sidebar-avatar">S</div>
+        <div class="sidebar-footer-info">
+          <span class="sidebar-footer-name" id="sidebar-name">Student</span>
+          <span class="sidebar-footer-role">Pro Learner</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================= -->
+    <!-- MAIN WORKSPACE                            -->
+    <!-- ========================================= -->
+    <div class="main-wrapper">
+
+      <!-- TOP NAVIGATION BAR -->
+      <header class="top-nav">
+        <div class="top-nav-left">
+          <button class="sidebar-toggle-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+          <div class="global-search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="global-search-input" id="globalSearchInput" placeholder="Global search..."
+              onfocus="openSearchModal()">
+          </div>
+        </div>
+
+        <div class="top-nav-right">
+          <button class="nav-action-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"
+              id="theme-icon"></i></button>
+          <button class="nav-action-btn" onclick="switchPage('notifications')">
+            <i class="fa-solid fa-bell"></i>
+            <span class="nav-badge" id="notif-badge">3</span>
+          </button>
+          <div class="nav-profile" onclick="switchPage('profile')">
+            <div class="nav-profile-avatar" id="top-nav-avatar">S</div>
+            <span class="nav-profile-name" id="top-nav-name">Student</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT PORTAL -->
+      <main class="content-container">
+
+        <!-- ========================================= -->
+        <!-- 1. DASHBOARD VIEW                         -->
+        <!-- ========================================= -->
+        <div id="page-dashboard" class="page-view active">
+          <div class="dashboard-header-banner">
+            <h2 class="dashboard-banner-title">Hello, <span id="hello-name">Student</span>! 👋</h2>
+            <p class="dashboard-banner-subtitle">Ready to conquer your goals today? Your current study streak is <strong
+                id="dash-streak">0</strong> days. Keep it up! 🔥</p>
+          </div>
+
+          <div class="dashboard-stats-strip">
+            <div class="dashboard-stat-card">
+              <div class="dashboard-stat-card-icon blue"><i class="fa-solid fa-clock"></i></div>
+              <div class="dashboard-stat-card-val" id="dash-hours-today">0h</div>
+              <div class="dashboard-stat-card-lbl">Study Today</div>
+            </div>
+            <div class="dashboard-stat-card">
+              <div class="dashboard-stat-card-icon purple"><i class="fa-solid fa-chart-simple"></i></div>
+              <div class="dashboard-stat-card-val" id="dash-hours-week">0h</div>
+              <div class="dashboard-stat-card-lbl">Weekly Hours</div>
+            </div>
+            <div class="dashboard-stat-card">
+              <div class="dashboard-stat-card-icon green"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="dashboard-stat-card-val" id="dash-countdown">--</div>
+              <div class="dashboard-stat-card-lbl">Days Remaining</div>
+            </div>
+            <div class="dashboard-stat-card">
+              <div class="dashboard-stat-card-icon purple"><i class="fa-solid fa-fire"></i></div>
+              <div class="dashboard-stat-card-val" id="dash-streak-card">0 days</div>
+              <div class="dashboard-stat-card-lbl">Study Streak</div>
+            </div>
+          </div>
+
+          <div class="grid-layout">
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-chart-column"></i> Weekly Study Activity</h3>
+                </div>
+                <canvas id="weeklyActivityChart" height="220"></canvas>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Coach Recommendations</h3>
+                </div>
+                <div id="ai-recs-container">
+                  <div class="recommendation-alert">
+                    <i class="fa-solid fa-circle-info"></i> Welcome! Complete the study planner details to see
+                    personalized AI recommendations.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-circle-check"></i> Today's Tasks</h3>
+                </div>
+                <div id="dash-tasks-list">
+                  <div class="empty-state">
+                    <i class="fa-solid fa-calendar-xmark"></i>
+                    <p class="empty-state-title">No tasks for today</p>
+                    <p class="empty-state-desc">Generate a study plan to populate daily checklist tasks.</p>
+                    <button class="btn btn-sm" onclick="switchPage('planner')">Set Planner</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-bolt"></i> Recent Activity</h3>
+                </div>
+                <ul class="recent-activity-list" id="recent-activity-container">
+                  <li class="recent-activity-item">
+                    <div class="recent-activity-dot"></div>
+                    <div class="recent-activity-content">
+                      <div class="recent-activity-title">SmartPrep AI account created!</div>
+                      <div class="recent-activity-time">Just now</div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 2. STUDY PLANNER VIEW                     -->
+        <!-- ========================================= -->
+        <div id="page-planner" class="page-view">
+          <div class="grid-layout">
+            <div>
+              <div class="card">
+                <div class="planner-tabs">
+                  <button class="planner-tab-btn active" onclick="switchPlannerTab('calendar')">Calendar View</button>
+                  <button class="planner-tab-btn" onclick="switchPlannerTab('list')">Checklist View</button>
+                  <button class="planner-tab-btn" onclick="switchPlannerTab('raw')">Markdown Plan Output</button>
+                  <button class="planner-tab-btn" onclick="switchPlannerTab('quick')">Quick Tools</button>
+                </div>
+
+                <!-- Tab: Calendar -->
+                <div id="planner-tab-calendar" class="planner-tab-content active">
+                  <div class="calendar-grid" id="calendar-view-grid">
+                    <!-- Grid header/cells loaded dynamically -->
+                  </div>
+                </div>
+
+                <!-- Tab: Checklist -->
+                <div id="planner-tab-list" class="planner-tab-content">
+                  <div id="planner-tasks-checklist">
+                    <div class="empty-state">
+                      <i class="fa-solid fa-list-check"></i>
+                      <p class="empty-state-title">Checklist is empty</p>
+                      <p class="empty-state-desc">Submit your details and generate a study plan to see daily items
+                        checklist.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tab: Raw Output -->
+                <div id="planner-tab-raw" class="planner-tab-content">
+                  <div class="markdown-output" id="raw-planner-output">
+                    Fill in details on the right and click "Generate Study Plan" to view.
+                  </div>
+                </div>
+
+                <!-- Tab: Quick Tools -->
+                <div id="planner-tab-quick" class="planner-tab-content">
+                  <div class="grid-2">
+                    <div class="card" style="margin-bottom: 0;">
+                      <h4>Daily Task Planner</h4>
+                      <label>Today's Date</label>
+                      <input id="quick-today" type="date">
+                      <label>Days Remaining</label>
+                      <input id="quick-remaining" placeholder="e.g. 15">
+                      <label>Syllabus Left</label>
+                      <input id="quick-left" placeholder="e.g. Operating Systems, DBMS">
+                      <button class="btn btn-sm" onclick="runQuickTool('daily')">Generate Today's Task</button>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                      <h4>Revision & Motivation</h4>
+                      <button class="btn btn-sm btn-secondary" onclick="runQuickTool('revision')">Generate Revision
+                        Plan</button>
+                      <button class="btn btn-sm btn-secondary" style="margin-top:10px;"
+                        onclick="runQuickTool('mock')">Generate Mock Schedule</button>
+
+                      <label style="margin-top:20px;">Analyze Mock Score</label>
+                      <input id="quick-score" placeholder="e.g., Score: 72/100 on DBMS">
+                      <button class="btn btn-sm" style="margin-top:8px;" onclick="runQuickTool('weakness')">Analyze
+                        Weakness</button>
+
+                      <label style="margin-top:20px;">Get Motivation Boost</label>
+                      <input id="quick-prog" placeholder="e.g. completed 4 of 6 chapters">
+                      <button class="btn btn-sm" style="margin-top:8px;" onclick="runQuickTool('motivation')">Get
+                        Motivation</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-pen-to-square"></i> Student Intake Intake</h3>
+                </div>
+                <label>Full Name</label>
+                <input id="plan-name" placeholder="Student Name">
+                <label>Exam Title</label>
+                <input id="plan-exam" placeholder="e.g., Computer Science Final">
+                <label>Date of Exam</label>
+                <input id="plan-date" type="date">
+                <label>Syllabus Topics</label>
+                <textarea id="plan-topics" placeholder="Enter topics separated by commas"></textarea>
+                <label>Strong Subjects</label>
+                <input id="plan-strong" placeholder="e.g. Programming basics">
+                <label>Weak Subjects</label>
+                <input id="plan-weak" placeholder="e.g. Memory management">
+                <label>Daily Study Hours</label>
+                <input id="plan-hours" type="number" min="1" max="18" placeholder="5">
+                <label>Preferred Study Time</label>
+                <select id="plan-time">
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Evening">Evening</option>
+                  <option value="Night">Night</option>
+                </select>
+                <label>Already Completed Topics</label>
+                <input id="plan-completed" placeholder="e.g. basic functions">
+
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top: 20px;">
+                  <button class="btn" onclick="saveIntakeDetails()">Save Info Only</button>
+                  <button id="btn-generate-interactive" class="btn btn-secondary"
+                    onclick="generateInteractivePlan()">Generate Interactive Planner</button>
+                  <button class="btn btn-outline" onclick="generateRawPlan()">Generate Markdown Table</button>
+                  <button class="btn btn-outline" onclick="runQuickMasterPlan()">One-Shot Master Plan</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 3. AI TUTOR VIEW                          -->
+        <!-- ========================================= -->
+        <div id="page-tutor" class="page-view">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-robot"></i> AI Multi-turn Tutor</h3>
+              <button class="btn btn-sm btn-outline" onclick="resetChatHistory()"><i
+                  class="fa-solid fa-rotate-left"></i> Reset Chat</button>
+            </div>
+
+            <div class="chat-box">
+              <div class="chat-messages" id="chat-messages-box">
+                <div class="chat-msg assistant">
+                  <div class="chat-bubble">
+                    Hello! I'm your AI Prep Tutor. Ask me any question about your exam topics, and I will explain
+                    concepts simply, give step-by-step instructions, memory tricks, and suggest learning videos.
+                  </div>
+                  <div class="chat-meta">Coach</div>
+                </div>
+              </div>
+
+              <div class="chat-input-bar">
+                <input type="text" id="chat-msg-input" placeholder="Ask about paging, OOP, normalization, SQL joins..."
+                  onkeydown="if(event.key === 'Enter') sendTutorMessage()">
+                <button class="btn" onclick="sendTutorMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 4. VIDEO LEARNING VIEW                    -->
+        <!-- ========================================= -->
+        <div id="page-videos" class="page-view">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-video"></i> Video Academy Portal</h3>
+            </div>
+
+            <div class="video-search-strip">
+              <div class="video-search-input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="video-search-input"
+                  placeholder="Search educational videos (e.g. database schema normalization, OOP tutorial)"
+                  onkeydown="if(event.key === 'Enter') searchVideos()">
+              </div>
+              <button class="btn" onclick="searchVideos()">Search</button>
+              <button class="btn btn-outline" onclick="refreshRecommendedVideos()"><i
+                  class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+            </div>
+
+            <div class="search-history-tags" id="video-history-tags">
+              <!-- tags injected dynamically -->
+            </div>
+
+            <div class="planner-tabs" style="margin-bottom: 24px;">
+              <button class="planner-tab-btn active" id="video-tab-btn-explore"
+                onclick="switchVideoTab('explore')">Explore Suggestions</button>
+              <button class="planner-tab-btn" id="video-tab-btn-bookmarks"
+                onclick="switchVideoTab('bookmarks')">Bookmarks (<span id="count-bookmarks">0</span>)</button>
+              <button class="planner-tab-btn" id="video-tab-btn-recent" onclick="switchVideoTab('recent')">Recently
+                Viewed</button>
+            </div>
+
+            <div class="videos-grid" id="videos-grid-container">
+              <!-- Skeleton cards / video cards loaded dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 5. MOCK TESTS VIEW                        -->
+        <!-- ========================================= -->
+        <div id="page-mock-tests" class="page-view">
+          <div class="card" id="mock-setup-container">
+            <div class="quiz-constructor">
+              <h3 style="text-align: center; margin-bottom: 20px;">AI Mock Test Generator</h3>
+              <label>Subject</label>
+              <input id="mock-subject" placeholder="e.g. Computer Science">
+              <label>Specific Topic</label>
+              <input id="mock-topic" placeholder="e.g. SQL Normalization or CPU Scheduling">
+              <label>Difficulty</label>
+              <select id="mock-difficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+              <label>Number of Questions</label>
+              <select id="mock-num">
+                <option value="3">3 Questions (Speed Test)</option>
+                <option value="5" selected>5 Questions (Standard)</option>
+                <option value="10">10 Questions (Complete Test)</option>
+              </select>
+
+              <button class="btn" style="width: 100%; margin-top: 30px;" onclick="generateMockQuiz()">Generate Mock
+                Test</button>
+            </div>
+          </div>
+
+          <!-- Interactive Quiz Session -->
+          <div class="card quiz-session" id="mock-session-container">
+            <div class="quiz-header-bar">
+              <h3 id="quiz-title-head">Mock Test</h3>
+              <div class="quiz-timer" id="quiz-timer-display">Time Remaining: 00:00</div>
+            </div>
+
+            <div class="quiz-question-container" id="quiz-question-box">
+              <!-- Question content injected dynamically -->
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <button class="btn btn-outline" id="quiz-prev-btn" onclick="prevQuizQuestion()">Previous</button>
+              <button class="btn" id="quiz-next-btn" onclick="nextQuizQuestion()">Next</button>
+            </div>
+          </div>
+
+          <!-- Results Evaluation View -->
+          <div class="card" id="mock-results-container" style="display:none;">
+            <div class="review-score-container">
+              <div class="review-score-circle" id="mock-score-circle">0/0</div>
+              <h2>Evaluation Report</h2>
+              <p id="mock-grade-summary">Loading AI Evaluator suggestions...</p>
+              <button class="btn btn-outline btn-sm" style="margin-top:14px;" onclick="exitMockQuiz()">Exit Quiz
+                Session</button>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 24px;">
+              <div class="card" style="margin-bottom: 0;">
+                <h4>Topic Performance</h4>
+                <div id="mock-topic-stats-box" style="margin-top:12px;"></div>
+              </div>
+              <div class="card" style="margin-bottom: 0;">
+                <h4>Weak Areas & AI Plan</h4>
+                <ul style="padding-left: 20px; font-size:0.9rem;" id="mock-weaknesses-list"></ul>
+              </div>
+            </div>
+
+            <h3>Detailed Review</h3>
+            <div id="mock-review-questions-box" style="margin-top:14px;">
+              <!-- evaluation item components -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 6. FLASHCARDS VIEW                        -->
+        <!-- ========================================= -->
+        <div id="page-flashcards" class="page-view">
+          <div class="grid-layout">
+            <div>
+              <div class="card flashcard-deck-layout">
+                <div class="card-header">
+                  <span id="flashcard-deck-idx" style="font-size:0.85rem; font-weight:700; color:var(--text-light)">0 of
+                    0 cards</span>
+                  <div>
+                    <button class="btn-sm btn-outline btn" onclick="toggleFlashcardBookmark()"><i
+                        class="fa-regular fa-star" id="flashcard-star-icon"></i> Bookmark</button>
+                    <button class="btn-sm btn-outline btn" onclick="toggleFlashcardLearned()"><i
+                        class="fa-regular fa-square-check" id="flashcard-check-icon"></i> Learned</button>
+                  </div>
+                </div>
+
+                <div class="flashcard-stage" onclick="flipFlashcard()">
+                  <div class="flashcard" id="flashcard-card-obj">
+                    <div class="flashcard-face flashcard-front">
+                      <div class="flashcard-lbl">Question</div>
+                      <div class="flashcard-q-text" id="flashcard-q-text">Click "Generate Flashcards" on the right
+                        sidebar to start!</div>
+                    </div>
+                    <div class="flashcard-face flashcard-back">
+                      <div class="flashcard-lbl">Explanation</div>
+                      <div class="flashcard-ans-text" id="flashcard-a-text">Click the card to flip it. Use controls
+                        below to shuffle or bookmark.</div>
+                      <div class="flashcard-details-row">
+                        <div><strong>Key Points:</strong> <span id="flashcard-key-pts">None</span></div>
+                        <div><strong>Example:</strong> <span id="flashcard-example">None</span></div>
+                        <div><strong>Mnemonic:</strong> <em id="flashcard-mnemonic">None</em></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flashcard-deck-controls">
+                  <button class="btn btn-outline" onclick="prevFlashcard()"><i class="fa-solid fa-arrow-left"></i>
+                    Prev</button>
+                  <button class="btn btn-outline btn-secondary" onclick="shuffleFlashcards()"><i
+                      class="fa-solid fa-shuffle"></i> Shuffle</button>
+                  <button class="btn" onclick="nextFlashcard()">Next <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Constructor</h3>
+                </div>
+                <label>Topic</label>
+                <input id="flash-topic" placeholder="e.g. CPU Scheduling Algorithms">
+                <label>Reference Notes / Summary (Optional)</label>
+                <textarea id="flash-notes"
+                  placeholder="Paste textbook notes here to generate customized cards..."></textarea>
+                <button class="btn" style="width:100%; margin-top:20px;" onclick="generateFlashcards()">Generate AI
+                  Cards</button>
+
+                <label style="margin-top:24px;">Filters</label>
+                <select id="flashcard-filter" onchange="filterFlashcards()">
+                  <option value="all">Show All</option>
+                  <option value="bookmarked">Bookmarked Only</option>
+                  <option value="learned">Learned Only</option>
+                  <option value="unlearned">Not Learned</option>
+                </select>
+
+                <label style="margin-top:14px;">Search Cards</label>
+                <input id="flashcard-search" placeholder="Type query to filter..." oninput="searchFlashcardsLocal()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 7. PROGRESS VIEW                          -->
+        <!-- ========================================= -->
+        <div id="page-progress" class="page-view">
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-square-poll-vertical"></i> Subject Mastery</h3>
+              </div>
+              <div id="progress-subjects-mastery">
+                <!-- circular progress indicators load here -->
+                <div class="empty-state">No subjects registered yet. Complete intake form.</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-chart-line"></i> Mock Performance Tracking</h3>
+              </div>
+              <canvas id="quizProgressChart" height="240"></canvas>
+            </div>
+          </div>
+
+          <div class="grid-layout">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-calendar-days"></i> Study Heatmap Activity</h3>
+              </div>
+              <p style="font-size:0.8rem; color:var(--text-secondary)">Consistency represents days where you updated
+                your study planner or checked tasks.</p>
+              <div class="heatmap-grid" id="progress-heatmap">
+                <!-- heatmap grids -->
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-shield-halved"></i> Badge Collection</h3>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:12px;" id="badges-container">
+                <!-- badge collection dynamic -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 8. NOTIFICATIONS VIEW                     -->
+        <!-- ========================================= -->
+        <div id="page-notifications" class="page-view">
+          <div class="card" style="max-width:700px; margin: 0 auto;">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-bell"></i> Reminders & Alert Logs</h3>
+              <button class="btn btn-sm btn-outline" onclick="clearAllNotifications()">Clear All</button>
+            </div>
+
+            <div id="notifications-alerts-list">
+              <!-- Alert items loaded dynamically -->
+            </div>
+
+            <h4 style="margin-top:30px; margin-bottom:12px;">Add Custom Reminder</h4>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="custom-notif-text" placeholder="e.g. Mock test study group in 2 hours">
+              <button class="btn" onclick="addCustomNotification()">Add</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 9. SETTINGS VIEW                          -->
+        <!-- ========================================= -->
+        <div id="page-settings" class="page-view">
+          <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h3 style="margin-bottom: 24px;"><i class="fa-solid fa-sliders"></i> Platform Settings</h3>
+
+            <h4>Theme Customization</h4>
+            <div style="display:flex; gap:10px; margin-top:10px; margin-bottom: 24px;">
+              <button class="btn btn-outline" style="flex:1" onclick="setAppTheme('light')"><i
+                  class="fa-solid fa-sun"></i> Light Mode</button>
+              <button class="btn btn-outline" style="flex:1" onclick="setAppTheme('dark')"><i
+                  class="fa-solid fa-moon"></i> Dark Mode</button>
+            </div>
+
+            <h4>AI Coach Configuration</h4>
+            <label>Coach Tone & Persona</label>
+            <select id="setting-ai-personality" onchange="saveSettingsLocal()">
+              <option value="encouraging">Encouraging & Motivational (Default)</option>
+              <option value="strict">Strict & Disciplined</option>
+              <option value="concise">Direct & Concise</option>
+            </select>
+
+            <label>Study Mode Preferences</label>
+            <select id="setting-study-mode" onchange="saveSettingsLocal()">
+              <option value="standard">Standard Balanced Plan</option>
+              <option value="intensive">Intensive Study (Fast-paced)</option>
+              <option value="revision">Revision Heavy</option>
+            </select>
+
+            <h4 style="margin-top:24px;">Sync & Reset Data</h4>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:12px;">
+              <button class="btn btn-outline" onclick="resetAllLocalStorage()"><i class="fa-solid fa-trash-can"></i>
+                Clear All Saved Progress</button>
+              <button class="btn btn-secondary" onclick="resetServerSession()"><i class="fa-solid fa-power-off"></i>
+                Reset Server Session</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- 10. PROFILE VIEW                          -->
+        <!-- ========================================= -->
+        <div id="page-profile" class="page-view">
+          <div class="card" style="max-width: 600px; margin: 0 auto; text-align: center;">
+            <div class="sidebar-footer-avatar"
+              style="width: 90px; height: 90px; font-size: 2.5rem; margin: 0 auto 16px;" id="profile-avatar-big">S</div>
+            <h2 id="profile-title-name">Student</h2>
+            <p style="color:var(--text-secondary); margin-bottom:20px;">Exam Candidate (Targeting Excellence)</p>
+
+            <div class="grid-3" style="text-align:left; margin-bottom: 24px;">
+              <div class="card" style="padding: 16px; text-align:center; margin-bottom: 0;">
+                <div class="dashboard-stat-card-val" id="profile-hours-studied">0</div>
+                <div class="dashboard-stat-card-lbl">Hours Studied</div>
+              </div>
+              <div class="card" style="padding: 16px; text-align:center; margin-bottom: 0;">
+                <div class="dashboard-stat-card-val" id="profile-tests-taken">0</div>
+                <div class="dashboard-stat-card-lbl">Mock Tests</div>
+              </div>
+              <div class="card" style="padding: 16px; text-align:center; margin-bottom: 0;">
+                <div class="dashboard-stat-card-val" id="profile-streak-count">0</div>
+                <div class="dashboard-stat-card-lbl">Day Streak</div>
+              </div>
+            </div>
+
+            <div style="text-align: left;">
+              <label>Modify Name</label>
+              <input id="profile-name-input" placeholder="Enter Name">
+              <label>Target Exam</label>
+              <input id="profile-exam-input" placeholder="e.g. Finals">
+              <label>Target Score Goal (%)</label>
+              <input id="profile-score-input" type="number" placeholder="e.g. 90">
+              <button class="btn" style="width:100%; margin-top:20px;" onclick="saveProfileChanges()">Update
+                Profile</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================= -->
+  <!-- GLOBAL SEARCH OVERLAY MODAL               -->
+  <!-- ========================================= -->
+  <div class="search-overlay" id="searchOverlay" onclick="closeSearchModal(event)">
+    <div class="search-modal" onclick="event.stopPropagation()">
+      <div class="search-modal-header">
+        <h4>Global Search Results</h4>
+        <button class="clear-history-btn" onclick="closeSearchModal(null)">Close</button>
+      </div>
+      <div class="search-modal-results" id="search-results-box">
+        <!-- Search result items injected dynamically -->
+        <div style="text-align:center; color:var(--text-light)">Type search query above...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ========================================= -->
+  <!-- JAVASCRIPT STATE ENGINE                   -->
+  <!-- ========================================= -->
+  <script>
+    // ----------------------------------------------------
+    // CLIENT STATE MANAGEMENT
+    // ----------------------------------------------------
+    let appState = {
+      theme: 'light',
+      sidebarCollapsed: false,
+      studentDetails: {
+        name: 'Student',
+        exam_name: '',
+        exam_date: '',
+        subjects: '',
+        strong_subjects: '',
+        weak_subjects: '',
+        study_hours: '5',
+        preferred_time: 'Evening',
+        completed: 'None'
+      },
+      studyPlan: null, // Interactive JSON Study Plan
+      mockHistory: [],
+      flashcards: [],
+      bookmarksVideos: [],
+      recentVideos: [],
+      searchHistory: [],
+      notifications: [
+        { id: '1', text: 'Welcome to SmartPrep AI! Update your Study Planner profile to start.', type: 'info', time: 'Just now' },
+        { id: '2', text: 'Daily Task Alert: Generate plan to schedule tomorrow\'s tasks.', type: 'info', time: '5m ago' },
+        { id: '3', text: 'Mock test scheduled for Saturdays. Keep studying!', type: 'info', time: '1h ago' }
+      ],
+      settings: {
+        personality: 'encouraging',
+        studyMode: 'standard'
+      },
+      streak: 0,
+      totalHoursStudied: 0
+    };
+
+    // Chart References
+    let weeklyChartRef = null;
+    let mockChartRef = null;
+
+    // Flashcards state
+    let currentFlashcardIdx = 0;
+
+    // Mock test session state
+    let mockQuizQuestions = [];
+    let mockQuizAnswers = {};
+    let mockQuizCurrentIdx = 0;
+    let mockQuizTimerVal = 0;
+    let mockQuizTimerInterval = null;
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', async () => {
+      await loadStateFromStorage();
+      applyTheme(appState.theme);
+      syncUIState();
+      initializeHeatmap();
+      initializeCharts();
+
+      // Listen for search input typing
+      document.getElementById('globalSearchInput').addEventListener('input', runGlobalSearch);
+    });
+
+    // Load from localStorage
+    async function loadStateFromStorage() {
+      const saved = localStorage.getItem('auraexam_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          appState = { ...appState, ...parsed };
+        } catch (e) {
+          console.error("Failed to parse LocalStorage state", e);
+        }
+      } else {
+        // Try to fetch saved plan from server session if exists
+        try {
+          const res = await fetch('/api/get_saved_plan');
+          if (res.ok) {
+            const plan = await res.json();
+            appState.studyPlan = plan;
+          }
+        } catch (e) {
+          console.debug('No server-saved plan or fetch failed', e);
+        }
+        // populate defaults if empty
+        saveStateToStorage();
+      }
+    }
+
+    // Save to localStorage
+    function saveStateToStorage() {
+      localStorage.setItem('auraexam_state', JSON.stringify(appState));
+    }
+
+    // Sync client profile values to input elements
+    function syncUIState() {
+      // Fill sidebar and profile
+      const name = appState.studentDetails.name || 'Student';
+      const init = name.charAt(0).toUpperCase();
+
+      document.getElementById('sidebar-name').innerText = name;
+      document.getElementById('sidebar-avatar').innerText = init;
+      document.getElementById('top-nav-name').innerText = name;
+      document.getElementById('top-nav-avatar').innerText = init;
+      document.getElementById('profile-avatar-big').innerText = init;
+      document.getElementById('profile-title-name').innerText = name;
+      document.getElementById('hello-name').innerText = name;
+
+      // Intake forms
+      document.getElementById('plan-name').value = appState.studentDetails.name || '';
+      document.getElementById('plan-exam').value = appState.studentDetails.exam_name || '';
+      document.getElementById('plan-date').value = appState.studentDetails.exam_date || '';
+      document.getElementById('plan-topics').value = appState.studentDetails.subjects || '';
+      document.getElementById('plan-strong').value = appState.studentDetails.strong_subjects || '';
+      document.getElementById('plan-weak').value = appState.studentDetails.weak_subjects || '';
+      document.getElementById('plan-hours').value = appState.studentDetails.study_hours || '';
+      document.getElementById('plan-time').value = appState.studentDetails.preferred_time || 'Evening';
+      document.getElementById('plan-completed').value = appState.studentDetails.completed || '';
+
+      // Settings & profile inputs
+      document.getElementById('profile-name-input').value = name;
+      document.getElementById('profile-exam-input').value = appState.studentDetails.exam_name || '';
+      document.getElementById('profile-score-input').value = appState.studentDetails.targetScore || '90';
+      document.getElementById('setting-ai-personality').value = appState.settings.personality || 'encouraging';
+      document.getElementById('setting-study-mode').value = appState.settings.studyMode || 'standard';
+
+      // Dashboard widgets
+      document.getElementById('dash-streak').innerText = appState.streak || '0';
+      document.getElementById('dash-streak-card').innerText = (appState.streak || '0') + ' days';
+      document.getElementById('dash-hours-today').innerText = (appState.studyPlan ? appState.studentDetails.study_hours : 0) + 'h';
+      document.getElementById('dash-hours-week').innerText = (appState.studyPlan ? parseInt(appState.studentDetails.study_hours) * 5 : 0) + 'h';
+
+      // Profile counts
+      document.getElementById('profile-streak-count').innerText = appState.streak || '0';
+      document.getElementById('profile-tests-taken').innerText = appState.mockHistory.length || '0';
+      document.getElementById('profile-hours-studied').innerText = appState.totalHoursStudied || '0';
+
+      // Calculate Countdown
+      if (appState.studentDetails.exam_date) {
+        const now = new Date();
+        const exam = new Date(appState.studentDetails.exam_date);
+        const diffTime = exam - now;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0) {
+          document.getElementById('dash-countdown').innerText = diffDays;
+        } else {
+          document.getElementById('dash-countdown').innerText = "Exam Over";
+        }
+      } else {
+        document.getElementById('dash-countdown').innerText = "--";
+      }
+
+      // Refresh notifications badges
+      document.getElementById('notif-badge').innerText = appState.notifications.length;
+      document.getElementById('count-bookmarks').innerText = appState.bookmarksVideos.length;
+
+      // Load dynamic lists
+      loadDashboardTasks();
+      loadPlannerCalendar();
+      loadPlannerChecklist();
+      loadNotificationsList();
+      renderVideoHistoryTags();
+      loadActiveVideoView();
+      loadActiveFlashcard();
+      renderSubjectMasteryList();
+      loadBadgeCollection();
+    }
+
+    // ----------------------------------------------------
+    // NAVIGATION ROUTING
+    // ----------------------------------------------------
+    function switchPage(pageId) {
+      // hide all page views
+      const views = document.querySelectorAll('.page-view');
+      views.forEach(v => v.classList.remove('active'));
+
+      // remove active sidebar class
+      const menuItems = document.querySelectorAll('.sidebar-item');
+      menuItems.forEach(item => item.classList.remove('active'));
+
+      // show target view
+      const targetView = document.getElementById('page-' + pageId);
+      if (targetView) {
+        targetView.classList.add('active');
+      }
+
+      // add active state to menu item
+      // find menu item matching pageId index
+      const pageMap = {
+        'dashboard': 0, 'planner': 1, 'tutor': 2, 'videos': 3,
+        'mock-tests': 4, 'flashcards': 5, 'progress': 6,
+        'notifications': 7, 'settings': 8, 'profile': 9
+      };
+      const targetIdx = pageMap[pageId];
+      if (targetIdx !== undefined && menuItems[targetIdx]) {
+        menuItems[targetIdx].classList.add('active');
+      }
+
+      // Special layout triggers e.g., chart resize
+      if (pageId === 'progress') {
+        setTimeout(updateProgressCharts, 100);
+      }
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+      appState.sidebarCollapsed = sidebar.classList.contains('collapsed');
+      saveStateToStorage();
+    }
+
+    // ----------------------------------------------------
+    // UTILS & TOASTS
+    // ----------------------------------------------------
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      let iconClass = 'fa-circle-info';
+      if (type === 'success') iconClass = 'fa-circle-check';
+      if (type === 'error') iconClass = 'fa-circle-exclamation';
+
+      toast.innerHTML = `<i class="fa-solid ${iconClass}"></i><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function addActivityLog(activityTitle) {
+      const activityList = document.getElementById('recent-activity-container');
+      const item = document.createElement('li');
+      item.className = 'recent-activity-item';
+      item.innerHTML = `
+      <div class="recent-activity-dot"></div>
+      <div class="recent-activity-content">
+        <div class="recent-activity-title">${activityTitle}</div>
+        <div class="recent-activity-time">Just now</div>
+      </div>
+    `;
+      activityList.prepend(item);
+      if (activityList.children.length > 5) {
+        activityList.lastElementChild.remove();
+      }
+    }
+
+    // ----------------------------------------------------
+    // THEME MANAGER
+    // ----------------------------------------------------
+    function toggleTheme() {
+      const root = document.documentElement;
+      const current = root.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      appState.theme = theme;
+
+      const icon = document.getElementById('theme-icon');
+      if (theme === 'dark') {
+        icon.className = 'fa-solid fa-sun';
+      } else {
+        icon.className = 'fa-solid fa-moon';
+      }
+      saveStateToStorage();
+    }
+
+    function setAppTheme(theme) {
+      applyTheme(theme);
+      showToast(`Switched to ${theme} mode`, 'success');
+    }
+
+    // ----------------------------------------------------
+    // BACKEND API AJAX WRAPPER
+    // ----------------------------------------------------
+    async function apiCall(endpoint, payload) {
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload || {})
+        });
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || `HTTP error ${res.status}`);
+        }
+        return await res.json();
+      } catch (e) {
+        showToast(e.message, 'error');
+        throw e;
+      }
+    }
+
+    // ----------------------------------------------------
+    // 1. DASHBOARD & RECS ENGINE
+    // ----------------------------------------------------
+    function loadDashboardTasks() {
+      const list = document.getElementById('dash-tasks-list');
+      list.innerHTML = '';
+
+      if (!appState.studyPlan || !appState.studyPlan.schedule || appState.studyPlan.schedule.length === 0) {
+        list.innerHTML = `
+        <div class="empty-state">
+          <i class="fa-solid fa-calendar-xmark"></i>
+          <p class="empty-state-title">No tasks for today</p>
+          <p class="empty-state-desc">Generate a study plan to populate daily checklist tasks.</p>
+          <button class="btn btn-sm" onclick="switchPage('planner')">Set Planner</button>
+        </div>
+      `;
+        return;
+      }
+
+      // Use first day with incomplete tasks as today's dummy representation
+      let todaySchedule = appState.studyPlan.schedule[0];
+      // Find first day that isn't fully completed
+      for (let day of appState.studyPlan.schedule) {
+        const allDone = day.time_slots.every(slot => slot.completed);
+        if (!allDone) {
+          todaySchedule = day;
+          break;
+        }
+      }
+
+      if (todaySchedule) {
+        list.innerHTML = `<h5 style="margin-bottom:10px;">Day ${todaySchedule.day_number} Plan — ${todaySchedule.date}</h5>`;
+        todaySchedule.time_slots.forEach((slot, sIdx) => {
+          const item = document.createElement('div');
+          item.className = 'checklist-item';
+          item.onclick = () => toggleTaskCompletion(todaySchedule.day_number, sIdx);
+          item.innerHTML = `
+          <input type="checkbox" ${slot.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTaskCompletion(${todaySchedule.day_number}, ${sIdx})">
+          <div class="checklist-item-content">
+            <div class="checklist-item-title ${slot.completed ? 'completed' : ''}">${slot.subject} - ${slot.topic}</div>
+            <div class="checklist-item-meta">
+              <span><i class="fa-regular fa-clock"></i> ${slot.time}</span>
+              <span><i class="fa-solid fa-tag"></i> ${slot.task_type}</span>
+            </div>
+          </div>
+        `;
+          list.appendChild(item);
+        });
+      }
+    }
+
+    function renderSubjectMasteryList() {
+      const container = document.getElementById('progress-subjects-mastery');
+      container.innerHTML = '';
+
+      if (!appState.studentDetails.subjects) {
+        container.innerHTML = '<div class="empty-state">No subjects registered yet. Complete intake form.</div>';
+        return;
+      }
+
+      const subs = appState.studentDetails.subjects.split(',').map(s => s.trim());
+      subs.forEach(sub => {
+        // Calculate completion based on plan
+        let totalSlots = 0;
+        let completedSlots = 0;
+
+        if (appState.studyPlan && appState.studyPlan.schedule) {
+          appState.studyPlan.schedule.forEach(day => {
+            day.time_slots.forEach(slot => {
+              if (slot.subject.toLowerCase().includes(sub.toLowerCase()) || sub.toLowerCase().includes(slot.subject.toLowerCase())) {
+                totalSlots++;
+                if (slot.completed) completedSlots++;
+              }
+            });
+          });
+        }
+
+        const percent = totalSlots > 0 ? Math.round((completedSlots / totalSlots) * 100) : 10;
+
+        const widget = document.createElement('div');
+        widget.className = 'circular-progress-widget';
+        widget.innerHTML = `
+        <div class="circular-progress-circle" style="--percent: ${percent}">${percent}%</div>
+        <div class="circular-progress-info">
+          <div class="circular-progress-title">${sub}</div>
+          <div class="circular-progress-subtitle">${completedSlots}/${totalSlots} Slots Completed</div>
+        </div>
+      `;
+        container.appendChild(widget);
+      });
+    }
+
+    function updateAIRecommendations() {
+      const recsBox = document.getElementById('ai-recs-container');
+      recsBox.innerHTML = '';
+
+      if (!appState.studyPlan) {
+        recsBox.innerHTML = `
+        <div class="recommendation-alert">
+          <i class="fa-solid fa-circle-info"></i> Complete study planner intake and generate a plan to get AI recommendations.
+        </div>
+      `;
+        return;
+      }
+
+      // Construct recommendation list
+      const recs = [];
+      if (appState.studentDetails.weak_subjects) {
+        recs.push(`Spend 45 additional minutes reviewing formulas for weak topic: <strong>${appState.studentDetails.weak_subjects}</strong>.`);
+      }
+      recs.push(`Take a Mock Test this Saturday to evaluate your retention of this week's study plan.`);
+      recs.push(`Try out AI flashcard decks to practice memory recall for challenging terms.`);
+
+      recs.forEach(rec => {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'recommendation-alert';
+        alertDiv.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles" style="color:var(--purple); margin-right:8px;"></i> ${rec}`;
+        recsBox.appendChild(alertDiv);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 2. STUDY PLANNER CONTROLS
+    // ----------------------------------------------------
+    function switchPlannerTab(tabId) {
+      const btns = document.querySelectorAll('.planner-tab-btn');
+      btns.forEach(b => b.classList.remove('active'));
+
+      const contents = document.querySelectorAll('.planner-tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+
+      // Try to use the event target if available (inline handlers provide it sometimes)
+      try {
+        if (typeof event !== 'undefined' && event && event.target) {
+          event.target.classList.add('active');
+        } else {
+          // Fallback: find the button whose onclick references this tabId
+          const found = Array.from(btns).find(b => {
+            try { return b.getAttribute && b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + tabId + "'"); } catch (e) { return false; }
+          });
+          if (found) found.classList.add('active');
+        }
+      } catch (err) {
+        // If something goes wrong, still attempt to set first planner button active
+        if (btns[0]) btns[0].classList.add('active');
+      }
+
+      const target = document.getElementById('planner-tab-' + tabId);
+      if (target) document.getElementById('planner-tab-' + tabId).classList.add('active');
+    }
+
+    function getPlannerIntakePayload() {
+      return {
+        name: document.getElementById('plan-name').value,
+        exam_name: document.getElementById('plan-exam').value,
+        exam_date: document.getElementById('plan-date').value,
+        subjects: document.getElementById('plan-topics').value,
+        strong_subjects: document.getElementById('plan-strong').value,
+        weak_subjects: document.getElementById('plan-weak').value,
+        study_hours: document.getElementById('plan-hours').value,
+        preferred_time: document.getElementById('plan-time').value,
+        completed: document.getElementById('plan-completed').value
+      };
+    }
+
+    async function saveIntakeDetails() {
+      const payload = getPlannerIntakePayload();
+      if (!payload.exam_name) {
+        showToast("Please enter at least an Exam Name to save details", "error");
+        return;
+      }
+      const data = await apiCall('/api/collect', payload);
+      appState.studentDetails = { ...appState.studentDetails, ...payload };
+      saveStateToStorage();
+      syncUIState();
+      showToast("Student Intake Profile Saved ✅", "success");
+      addActivityLog("Saved Student Profile Intake Details");
+    }
+
+    async function generateRawPlan() {
+      await saveIntakeDetails();
+      switchPlannerTab('raw');
+      document.getElementById('raw-planner-output').innerHTML = '<div class="loading">Thinking... Generating study table...</div>';
+
+      try {
+        const data = await apiCall('/api/generate_plan');
+        document.getElementById('raw-planner-output').innerHTML = marked.parse(data.plan || data.error);
+        addActivityLog("Generated Markdown study plan");
+      } catch (e) {
+        document.getElementById('raw-planner-output').innerHTML = `Failed: ${e.message}`;
+      }
+    }
+
+    async function runQuickMasterPlan() {
+      await saveIntakeDetails();
+      switchPlannerTab('raw');
+      document.getElementById('raw-planner-output').innerHTML = '<div class="loading">Thinking... Building One-Shot Master Preparation Strategy...</div>';
+
+      try {
+        const data = await apiCall('/api/master_plan', getPlannerIntakePayload());
+        document.getElementById('raw-planner-output').innerHTML = marked.parse(data.plan || data.error);
+        addActivityLog("Generated One-Shot Master Plan");
+      } catch (e) {
+        document.getElementById('raw-planner-output').innerHTML = `Failed: ${e.message}`;
+      }
+    }
+
+    async function generateInteractivePlan() {
+      const payload = getPlannerIntakePayload();
+      if (!payload.exam_name || !payload.subjects) {
+        showToast("Ensure Exam Name and Syllabus Topics are filled in", "error");
+        return;
+      }
+
+      // Save info
+      await saveIntakeDetails();
+      switchPlannerTab('calendar');
+      const genBtn = document.getElementById('btn-generate-interactive');
+      if (genBtn) { genBtn.disabled = true; genBtn.dataset.orig = genBtn.innerText; genBtn.innerText = 'Generating...'; }
+      document.getElementById('calendar-view-grid').innerHTML = '<div class="loading" style="grid-column: span 7;">AI Coach is compiling interactive schedule calendar. Please wait...</div>';
+
+      try {
+        const data = await apiCall('/api/generate_plan_json', payload);
+        if (data.schedule) {
+          appState.studyPlan = data;
+          appState.streak = 1;
+          saveStateToStorage();
+          syncUIState();
+          showToast("Interactive Study Planner successfully generated!", "success");
+          addActivityLog("Generated Interactive Calendar Study Plan");
+          updateAIRecommendations();
+        } else {
+          throw new Error("Invalid plan schema returned by server");
+        }
+      } catch (e) {
+        document.getElementById('calendar-view-grid').innerHTML = `
+        <div style="grid-column: span 7; color:red; padding: 20px; text-align:center;">
+          Failed: ${e.message}. Fallback table loaded in "Markdown Plan Output" tab instead.
+        </div>
+      `;
+      } finally {
+        if (genBtn) { genBtn.disabled = false; genBtn.innerText = genBtn.dataset.orig || 'Generate Interactive Planner'; delete genBtn.dataset.orig; }
+      }
+    }
+
+    function loadPlannerCalendar() {
+      const grid = document.getElementById('calendar-view-grid');
+      grid.innerHTML = '';
+
+      if (!appState.studyPlan || !appState.studyPlan.schedule) {
+        grid.innerHTML = `
+        <div class="empty-state" style="grid-column: span 7;">
+          <i class="fa-solid fa-calendar-plus"></i>
+          <p class="empty-state-title">Calendar is empty</p>
+          <p class="empty-state-desc">Input student profile on the right sidebar and click 'Generate Interactive Planner'.</p>
+        </div>
+      `;
+        return;
+      }
+
+      // Render calendar headers
+      const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      days.forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'calendar-day-header';
+        h.innerText = d;
+        grid.appendChild(h);
+      });
+
+      // Render calendar cells
+      appState.studyPlan.schedule.forEach(day => {
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+
+        const completedCount = day.time_slots.filter(s => s.completed).length;
+        const totalCount = day.time_slots.length;
+
+        let badgeHtml = '';
+        if (day.is_revision_day) badgeHtml += '<span class="calendar-task-tag revision">Revision</span>';
+        if (day.is_mock_day) badgeHtml += '<span class="calendar-task-tag mock">Mock Test</span>';
+
+        // Render brief tags for tasks
+        let slotsHtml = '';
+        day.time_slots.slice(0, 2).forEach((slot) => {
+          const isDone = slot.completed ? 'completed' : '';
+          slotsHtml += `<div class="calendar-task-tag ${isDone}">${slot.subject}: ${slot.topic}</div>`;
+        });
+        if (totalCount > 2) {
+          slotsHtml += `<div class="calendar-task-tag break">+${totalCount - 2} more</div>`;
+        }
+
+        cell.innerHTML = `
+        <div class="calendar-cell-date">Day ${day.day_number}</div>
+        ${badgeHtml}
+        <div style="margin-top:6px;">${slotsHtml}</div>
+        <div style="font-size:0.65rem; color:var(--text-light); text-align:right; margin-top:8px;">${completedCount}/${totalCount} completed</div>
+      `;
+
+        cell.onclick = () => {
+          switchPlannerTab('list');
+          loadPlannerChecklist(day.day_number);
+        };
+
+        grid.appendChild(cell);
+      });
+    }
+
+    function loadPlannerChecklist(focusDay = null) {
+      const checklist = document.getElementById('planner-tasks-checklist');
+      checklist.innerHTML = '';
+
+      if (!appState.studyPlan || !appState.studyPlan.schedule) {
+        return;
+      }
+
+      let daysToRender = appState.studyPlan.schedule;
+      if (focusDay) {
+        daysToRender = appState.studyPlan.schedule.filter(d => d.day_number === focusDay);
+      }
+
+      daysToRender.forEach(day => {
+        const block = document.createElement('div');
+        block.className = 'card';
+        block.style.padding = '16px';
+        block.style.marginBottom = '16px';
+        block.innerHTML = `
+        <h4 style="margin-bottom:12px; display:flex; justify-content:space-between;">
+          <span>Day ${day.day_number} Planner Checklist — ${day.date}</span>
+          <span style="font-size:0.8rem; color:var(--accent)">
+            ${day.is_revision_day ? 'Revision Day' : ''} ${day.is_mock_day ? 'Mock Test Day' : ''}
+          </span>
+        </h4>
+      `;
+
+        day.time_slots.forEach((slot, sIdx) => {
+          const check = document.createElement('div');
+          check.className = 'checklist-item';
+          check.onclick = () => toggleTaskCompletion(day.day_number, sIdx);
+          check.innerHTML = `
+          <input type="checkbox" ${slot.completed ? 'checked' : ''} onclick="event.stopPropagation(); toggleTaskCompletion(${day.day_number}, ${sIdx})">
+          <div class="checklist-item-content">
+            <div class="checklist-item-title ${slot.completed ? 'completed' : ''}">${slot.subject} - ${slot.topic}</div>
+            <div class="checklist-item-meta">
+              <span><i class="fa-regular fa-clock"></i> ${slot.time}</span>
+              <span><i class="fa-solid fa-star-of-life"></i> ${slot.task_type}</span>
+              <span>${slot.notes}</span>
+            </div>
+          </div>
+        `;
+          block.appendChild(check);
+        });
+
+        checklist.appendChild(block);
+      });
+    }
+
+    function toggleTaskCompletion(dayNum, slotIdx) {
+      if (!appState.studyPlan || !appState.studyPlan.schedule) return;
+
+      const day = appState.studyPlan.schedule.find(d => d.day_number === dayNum);
+      if (day && day.time_slots[slotIdx]) {
+        const slot = day.time_slots[slotIdx];
+        slot.completed = !slot.completed;
+
+        // Update statistics
+        if (slot.completed) {
+          appState.totalHoursStudied += 2; // Assume average slot is 2 hours
+          showToast("Task completed! Keep the momentum up! 🔥", "success");
+          addActivityLog(`Completed task: ${slot.subject} - ${slot.topic}`);
+        } else {
+          appState.totalHoursStudied = Math.max(0, appState.totalHoursStudied - 2);
+        }
+
+        saveStateToStorage();
+        syncUIState();
+        updateProgressCharts();
+      }
+    }
+
+    // Study Planner Quick Tools API Integrations
+    async function runQuickTool(toolType) {
+      const payload = getPlannerIntakePayload();
+      await saveIntakeDetails();
+      switchPlannerTab('raw');
+
+      const outBox = document.getElementById('raw-planner-output');
+      outBox.innerHTML = '<div class="loading">Thinking... Loading AI response...</div>';
+
+      try {
+        let res;
+        if (toolType === 'daily') {
+          const body = {
+            today: document.getElementById('quick-today').value || new Date().toISOString().split('T')[0],
+            remaining_days: document.getElementById('quick-remaining').value || '15',
+            remaining_subjects: document.getElementById('quick-left').value || payload.subjects
+          };
+          res = await apiCall('/api/daily_task', body);
+          outBox.innerHTML = marked.parse(res.task || res.error);
+          addActivityLog("Generated daily task schedule");
+        } else if (toolType === 'revision') {
+          res = await apiCall('/api/revision');
+          outBox.innerHTML = marked.parse(res.revision || res.error);
+          addActivityLog("Generated revision plan table");
+        } else if (toolType === 'mock') {
+          res = await apiCall('/api/mock_test');
+          outBox.innerHTML = marked.parse(res.mock_test || res.error);
+          addActivityLog("Generated weekly mock test plan");
+        } else if (toolType === 'weakness') {
+          res = await apiCall('/api/weakness', { score: document.getElementById('quick-score').value });
+          outBox.innerHTML = marked.parse(res.analysis || res.error);
+          addActivityLog("Evaluated weak subjects checklist");
+        } else if (toolType === 'motivation') {
+          res = await apiCall('/api/motivation', { progress: document.getElementById('quick-prog').value });
+          outBox.innerHTML = `<h3>Daily Coaching Boost</h3><p style="font-size:1.2rem; line-height:1.6; font-style:italic;">"${res.message || res.error}"</p>`;
+          addActivityLog("Generated motivational coaching boost");
+        }
+      } catch (e) {
+        outBox.innerHTML = `Failed: ${e.message}`;
+      }
+    }
+
+    // ----------------------------------------------------
+    // 3. AI TUTOR CHAT ENGINE
+    // ----------------------------------------------------
+    async function sendTutorMessage() {
+      const input = document.getElementById('chat-msg-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      input.value = '';
+
+      // Add user msg
+      appendChatMsg('user', msg);
+
+      // Add loading indicator
+      const loadId = appendChatMsg('assistant', '<div class="loading">Coach is researching and writing explanation...</div>');
+
+      try {
+        const data = await apiCall('/api/chat', { message: msg });
+        // Remove loading indicator and replace with final response
+        document.getElementById(loadId).innerHTML = marked.parse(data.reply);
+
+        addActivityLog(`Asked Tutor: "${msg.substring(0, 30)}..."`);
+
+        // If video suggestions are returned, render them below the answer bubble
+        if (data.videos && data.videos.length > 0) {
+          renderInlineVideoRecommendations(loadId, data.videos);
+        }
+      } catch (e) {
+        document.getElementById(loadId).innerText = `Error: ${e.message}`;
+      }
+    }
+
+    function appendChatMsg(role, content) {
+      const box = document.getElementById('chat-messages-box');
+      const msgDiv = document.createElement('div');
+      const id = 'tutor-msg-' + Math.random().toString(36).substring(2, 9);
+
+      msgDiv.className = `chat-msg ${role}`;
+      msgDiv.innerHTML = `
+      <div class="chat-bubble" id="${id}">${content}</div>
+      <div class="chat-meta">${role === 'user' ? 'You' : 'Coach'}</div>
+    `;
+      box.appendChild(msgDiv);
+      box.scrollTop = box.scrollHeight;
+      return id;
+    }
+
+    async function resetChatHistory() {
+      if (confirm("Are you sure you want to clear the conversation history?")) {
+        await apiCall('/api/reset');
+        const box = document.getElementById('chat-messages-box');
+        box.innerHTML = `
+        <div class="chat-msg assistant">
+          <div class="chat-bubble">
+            Chat history reset. Ask me anything to start fresh!
+          </div>
+          <div class="chat-meta">Coach</div>
+        </div>
+      `;
+        showToast("Chat history cleared successfully", "success");
+      }
+    }
+
+    function renderInlineVideoRecommendations(containerId, videos) {
+      const parentBubble = document.getElementById(containerId);
+
+      const panel = document.createElement('div');
+      panel.className = 'inline-videos-panel';
+      panel.innerHTML = `
+      <div class="inline-videos-title"><i class="fa-solid fa-play"></i> Suggested Educational Videos</div>
+    `;
+
+      const list = document.createElement('div');
+      list.className = 'inline-videos-list';
+
+      videos.forEach(v => {
+        const card = document.createElement('div');
+        card.className = 'inline-video-card';
+
+        // Default placeholder if thumbnail is missing
+        const thumbUrl = v.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500';
+
+        card.innerHTML = `
+        <div class="inline-video-thumb" style="background-image: url('${thumbUrl}')">
+          <span class="inline-video-duration">${v.duration}</span>
+        </div>
+        <div class="inline-video-info">
+          <div class="inline-video-title">${v.title}</div>
+          <div class="inline-video-channel">${v.channel_name}</div>
+          <div class="inline-video-actions">
+            <a href="${v.url}" target="_blank" class="btn btn-sm" onclick="logVideoView('${v.id}')">Watch</a>
+            <button class="btn btn-sm btn-outline" onclick="bookmarkVideoFromInline(${JSON.stringify(v).replace(/"/g, '&quot;')})">Bookmark</button>
+          </div>
+        </div>
+      `;
+        list.appendChild(card);
+      });
+
+      panel.appendChild(list);
+      parentBubble.appendChild(panel);
+      // Scroll bubble view
+      const box = document.getElementById('chat-messages-box');
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function bookmarkVideoFromInline(videoObj) {
+      // Check duplicates
+      if (appState.bookmarksVideos.some(v => v.id === videoObj.id)) {
+        showToast("Video already bookmarked", "info");
+        return;
+      }
+      appState.bookmarksVideos.push(videoObj);
+      saveStateToStorage();
+      syncUIState();
+      showToast("Video bookmarked to Video Academy", "success");
+    }
+
+    // ----------------------------------------------------
+    // 4. VIDEO LEARNING ENGINE (YOUTUBE INTEGRATION)
+    // ----------------------------------------------------
+    let activeVideoTab = 'explore';
+
+    function switchVideoTab(tabId) {
+      activeVideoTab = tabId;
+
+      const tabs = ['explore', 'bookmarks', 'recent'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`video-tab-btn-${t}`);
+        if (btn) btn.classList.remove('active');
+      });
+
+      document.getElementById(`video-tab-btn-${tabId}`).classList.add('active');
+      loadActiveVideoView();
+    }
+
+    function loadActiveVideoView() {
+      const grid = document.getElementById('videos-grid-container');
+      grid.innerHTML = '';
+
+      let list = [];
+      if (activeVideoTab === 'explore') {
+        // Show default search for topics if search is empty
+        if (appState.recentVideos.length > 0) {
+          list = appState.recentVideos;
+        } else {
+          // Mock empty state or initial instructions
+          grid.innerHTML = `
+          <div class="empty-state" style="grid-column: span 3;">
+            <i class="fa-solid fa-play"></i>
+            <p class="empty-state-title">Search Educational Videos</p>
+            <p class="empty-state-desc">Input a topic above (e.g. 'normalization') and search to retrieve real-time videos.</p>
+          </div>
+        `;
+          return;
+        }
+      } else if (activeVideoTab === 'bookmarks') {
+        list = appState.bookmarksVideos;
+        if (list.length === 0) {
+          grid.innerHTML = '<div class="empty-state" style="grid-column: span 3;"><p class="empty-state-title">No Bookmarked Videos</p></div>';
+          return;
+        }
+      } else if (activeVideoTab === 'recent') {
+        list = appState.recentVideos.slice(0, 6); // Top 6 recently viewed/searched
+        if (list.length === 0) {
+          grid.innerHTML = '<div class="empty-state" style="grid-column: span 3;"><p class="empty-state-title">No recently viewed videos</p></div>';
+          return;
+        }
+      }
+
+      renderVideosGrid(list);
+    }
+
+    async function searchVideos(customQuery = null) {
+      const input = document.getElementById('video-search-input');
+      const query = customQuery || input.value.trim();
+      if (!query) return;
+
+      input.value = query;
+      switchVideoTab('explore');
+
+      // Add to search tags history
+      if (!appState.searchHistory.includes(query)) {
+        appState.searchHistory.unshift(query);
+        if (appState.searchHistory.length > 6) appState.searchHistory.pop();
+      }
+
+      // Load skeleton loaders
+      renderVideoSkeletons();
+
+      try {
+        const data = await apiCall('/api/videos/search', { query: query });
+        if (data.videos) {
+          appState.recentVideos = data.videos;
+          saveStateToStorage();
+          syncUIState();
+          showToast(`Loaded videos for: "${query}"`, "success");
+        }
+      } catch (e) {
+        showToast("YouTube search failed. Generating fallback link.", "error");
+      }
+    }
+
+    function renderVideoSkeletons() {
+      const grid = document.getElementById('videos-grid-container');
+      grid.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+        <div class="skeleton skeleton-thumb"></div>
+        <div style="padding:16px;">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-desc"></div>
+          <div class="skeleton skeleton-desc"></div>
+        </div>
+      `;
+        grid.appendChild(card);
+      }
+    }
+
+    function renderVideosGrid(videosList) {
+      const grid = document.getElementById('videos-grid-container');
+      grid.innerHTML = '';
+
+      videosList.forEach(v => {
+        const isBookmarked = appState.bookmarksVideos.some(b => b.id === v.id) ? 'active' : '';
+        const thumb = v.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500';
+        const playsIcon = v.is_fallback ? 'fa-magnifying-glass' : 'fa-play';
+        const playText = v.is_fallback ? 'Search YouTube' : 'Watch on YouTube';
+
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+        <div class="video-thumb" style="background-image: url('${thumb}')">
+          <div class="video-thumb-play"><i class="fa-solid ${playsIcon}"></i></div>
+          <span class="inline-video-duration">${v.duration}</span>
+        </div>
+        <div class="video-details">
+          <div class="video-card-title">${v.title}</div>
+          <div class="video-card-meta">
+            <span>${v.channel_name}</span>
+            <span><i class="fa-solid fa-eye"></i> ${v.views}</span>
+          </div>
+          <div class="video-card-desc">${v.description}</div>
+          <div class="video-card-actions">
+            <a href="${v.url}" target="_blank" class="btn btn-sm video-card-btn-watch" onclick="logVideoView('${v.id}')">${playText}</a>
+            <button class="video-card-btn-icon ${isBookmarked}" onclick="toggleVideoBookmark(${JSON.stringify(v).replace(/"/g, '&quot;')})"><i class="fa-solid fa-bookmark"></i></button>
+            <button class="video-card-btn-icon" onclick="copyVideoLink('${v.url}')"><i class="fa-solid fa-link"></i></button>
+            <button class="video-card-btn-icon" onclick="shareVideoUrl('${v.title}', '${v.url}')"><i class="fa-solid fa-share-nodes"></i></button>
+          </div>
+        </div>
+      `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderVideoHistoryTags() {
+      const tagsBox = document.getElementById('video-history-tags');
+      tagsBox.innerHTML = '';
+
+      if (appState.searchHistory.length === 0) return;
+
+      const label = document.createElement('span');
+      label.className = 'search-history-lbl';
+      label.innerText = 'Recent Searches:';
+      tagsBox.appendChild(label);
+
+      appState.searchHistory.forEach(q => {
+        const tag = document.createElement('div');
+        tag.className = 'search-tag';
+        tag.innerHTML = `
+        <span onclick="searchVideos('${q}')">${q}</span>
+        <i class="fa-solid fa-xmark search-tag-remove" onclick="removeSearchHistoryTag('${q}')"></i>
+      `;
+        tagsBox.appendChild(tag);
+      });
+
+      const clearBtn = document.createElement('button');
+      clearBtn.className = 'clear-history-btn';
+      clearBtn.innerText = 'Clear';
+      clearBtn.onclick = clearVideoSearchHistory;
+      tagsBox.appendChild(clearBtn);
+    }
+
+    function removeSearchHistoryTag(query) {
+      appState.searchHistory = appState.searchHistory.filter(q => q !== query);
+      saveStateToStorage();
+      syncUIState();
+    }
+
+    function clearVideoSearchHistory() {
+      appState.searchHistory = [];
+      saveStateToStorage();
+      syncUIState();
+      showToast("Search history cleared", "info");
+    }
+
+    function toggleVideoBookmark(videoObj) {
+      const existsIdx = appState.bookmarksVideos.findIndex(b => b.id === videoObj.id);
+      if (existsIdx > -1) {
+        appState.bookmarksVideos.splice(existsIdx, 1);
+        showToast("Bookmark removed", "info");
+      } else {
+        appState.bookmarksVideos.push(videoObj);
+        showToast("Saved to Bookmarks Academy", "success");
+      }
+      saveStateToStorage();
+      syncUIState();
+    }
+
+    function copyVideoLink(url) {
+      navigator.clipboard.writeText(url);
+      showToast("Link copied to clipboard! 📋", "success");
+    }
+
+    function shareVideoUrl(title, url) {
+      if (navigator.share) {
+        navigator.share({ title: title, url: url })
+          .catch(console.error);
+      } else {
+        copyVideoLink(url);
+      }
+    }
+
+    function logVideoView(id) {
+      addActivityLog(`Watched YouTube video resource`);
+    }
+
+    async function refreshRecommendedVideos() {
+      const query = appState.studentDetails.subjects ? appState.studentDetails.subjects.split(',')[0] : "Education";
+      await searchVideos(query);
+    }
+
+    // ----------------------------------------------------
+    // 5. MOCK TEST SIMULATOR
+    // ----------------------------------------------------
+    async function generateMockQuiz() {
+      const subject = document.getElementById('mock-subject').value || 'Computer Science';
+      const topic = document.getElementById('mock-topic').value || 'Paging & Segmentation';
+      const diff = document.getElementById('mock-difficulty').value;
+      const num = document.getElementById('mock-num').value;
+
+      document.getElementById('mock-setup-container').style.display = 'none';
+      const sessionBox = document.getElementById('mock-session-container');
+      sessionBox.classList.add('active');
+      document.getElementById('quiz-question-box').innerHTML = '<div class="loading">Coach is composing custom evaluation test suite...</div>';
+
+      try {
+        const data = await apiCall('/api/mock_tests/generate', {
+          subject: subject,
+          topic: topic,
+          difficulty: diff,
+          num_questions: num
+        });
+
+        if (data.questions && data.questions.length > 0) {
+          mockQuizQuestions = data.questions;
+          mockQuizAnswers = {};
+          mockQuizCurrentIdx = 0;
+
+          // Start Timer (e.g. 5 minutes per question)
+          mockQuizTimerVal = mockQuizQuestions.length * 5 * 60;
+          startQuizTimer();
+
+          loadQuizQuestion();
+          addActivityLog(`Started Mock Quiz in ${topic}`);
+        } else {
+          throw new Error("Invalid mock test questions returned by server");
+        }
+      } catch (e) {
+        exitMockQuiz();
+      }
+    }
+
+    function startQuizTimer() {
+      if (mockQuizTimerInterval) clearInterval(mockQuizTimerInterval);
+
+      const display = document.getElementById('quiz-timer-display');
+      mockQuizTimerInterval = setInterval(() => {
+        mockQuizTimerVal--;
+        const min = Math.floor(mockQuizTimerVal / 60);
+        const sec = mockQuizTimerVal % 60;
+        display.innerText = `Time Remaining: ${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+        if (mockQuizTimerVal <= 0) {
+          clearInterval(mockQuizTimerInterval);
+          submitMockQuiz();
+        }
+      }, 1000);
+    }
+
+    function loadQuizQuestion() {
+      const container = document.getElementById('quiz-question-box');
+      container.innerHTML = '';
+
+      const q = mockQuizQuestions[mockQuizCurrentIdx];
+      document.getElementById('quiz-title-head').innerText = `Question ${mockQuizCurrentIdx + 1} of ${mockQuizQuestions.length}`;
+
+      const qNum = document.createElement('div');
+      qNum.className = 'quiz-question-num';
+      qNum.innerText = `Type: ${q.type.toUpperCase()}`;
+
+      const qText = document.createElement('div');
+      qText.className = 'quiz-question-text';
+      qText.innerText = q.question;
+
+      container.appendChild(qNum);
+      container.appendChild(qText);
+
+      if (q.type === 'mcq') {
+        const list = document.createElement('ul');
+        list.className = 'quiz-options-list';
+
+        const savedAns = mockQuizAnswers[q.id];
+
+        q.options.forEach(opt => {
+          const optionCard = document.createElement('li');
+          optionCard.className = `quiz-option-card ${savedAns === opt ? 'selected' : ''}`;
+          optionCard.innerText = opt;
+          optionCard.onclick = () => selectMCQAnswer(q.id, opt);
+          list.appendChild(optionCard);
+        });
+        container.appendChild(list);
+      } else {
+        // Short or Long answers get written textarea
+        const text = document.createElement('textarea');
+        text.placeholder = "Type your response answer here...";
+        text.value = mockQuizAnswers[q.id] || '';
+        text.oninput = (e) => { mockQuizAnswers[q.id] = e.target.value; };
+        container.appendChild(text);
+      }
+
+      // Toggle controls
+      document.getElementById('quiz-prev-btn').disabled = mockQuizCurrentIdx === 0;
+      const nextBtn = document.getElementById('quiz-next-btn');
+      if (mockQuizCurrentIdx === mockQuizQuestions.length - 1) {
+        nextBtn.innerText = 'Submit Mock Quiz';
+        nextBtn.className = 'btn btn-secondary';
+      } else {
+        nextBtn.innerText = 'Next';
+        nextBtn.className = 'btn';
+      }
+    }
+
+    function selectMCQAnswer(qId, selectedOpt) {
+      mockQuizAnswers[qId] = selectedOpt;
+      loadQuizQuestion();
+    }
+
+    function prevQuizQuestion() {
+      if (mockQuizCurrentIdx > 0) {
+        mockQuizCurrentIdx--;
+        loadQuizQuestion();
+      }
+    }
+
+    function nextQuizQuestion() {
+      if (mockQuizCurrentIdx === mockQuizQuestions.length - 1) {
+        submitMockQuiz();
+      } else {
+        mockQuizCurrentIdx++;
+        loadQuizQuestion();
+      }
+    }
+
+    async function submitMockQuiz() {
+      if (mockQuizTimerInterval) clearInterval(mockQuizTimerInterval);
+
+      const sessionBox = document.getElementById('mock-session-container');
+      sessionBox.classList.remove('active');
+
+      const resultsBox = document.getElementById('mock-results-container');
+      resultsBox.style.display = 'block';
+      document.getElementById('mock-score-circle').innerText = '...';
+      document.getElementById('mock-grade-summary').innerText = 'AI Coach evaluation in progress...';
+      document.getElementById('mock-topic-stats-box').innerHTML = '<div class="loading">Grading items...</div>';
+      document.getElementById('mock-weaknesses-list').innerHTML = '';
+      document.getElementById('mock-review-questions-box').innerHTML = '';
+
+      try {
+        const data = await apiCall('/api/mock_tests/evaluate', {
+          questions: mockQuizQuestions,
+          answers: mockQuizAnswers
+        });
+
+        // Save quiz to history
+        const savedTest = {
+          date: new Date().toLocaleDateString(),
+          subject: mockQuizQuestions[0] ? mockQuizQuestions[0].subject : 'Quiz',
+          score: data.score,
+          total: data.total_questions,
+          accuracy: data.accuracy,
+          evaluation: data
+        };
+
+        appState.mockHistory.push(savedTest);
+        saveStateToStorage();
+        syncUIState();
+
+        // Render Results UI
+        document.getElementById('mock-score-circle').innerText = `${data.score}/${data.total_questions}`;
+        document.getElementById('mock-grade-summary').innerText = `You achieved ${data.accuracy}% accuracy. Detailed AI report below:`;
+
+        // Topics
+        const topicStats = document.getElementById('mock-topic-stats-box');
+        topicStats.innerHTML = '';
+        data.topic_performance.forEach(tp => {
+          const row = document.createElement('div');
+          row.style.marginBottom = '10px';
+          row.innerHTML = `
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; margin-bottom:4px;">
+            <span>${tp.topic}</span>
+            <span>${tp.score}/${tp.total}</span>
+          </div>
+          <div style="background-color:var(--border); height:6px; border-radius:3px; overflow:hidden;">
+            <div style="background-color:var(--accent); height:100%; width:${(tp.score / tp.total) * 100}%"></div>
+          </div>
+        `;
+          topicStats.appendChild(row);
+        });
+
+        // Weak areas & Improvements
+        const weaknesses = document.getElementById('mock-weaknesses-list');
+        data.weak_areas.forEach(wa => {
+          const li = document.createElement('li');
+          li.innerText = wa;
+          weaknesses.appendChild(li);
+        });
+        data.improvements.forEach(imp => {
+          const li = document.createElement('li');
+          li.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--purple); margin-right:4px;"></i> ${imp}`;
+          weaknesses.appendChild(li);
+        });
+
+        // Render review list
+        const reviewBox = document.getElementById('mock-review-questions-box');
+        data.question_evaluations.forEach((evalObj, index) => {
+          const qOriginal = mockQuizQuestions.find(qu => qu.id === evalObj.id) || {};
+          const stateClass = evalObj.is_correct === true ? 'correct' : (evalObj.is_correct === false ? 'incorrect' : 'partial');
+          const stateText = evalObj.is_correct === true ? 'Correct' : (evalObj.is_correct === false ? 'Incorrect' : 'Partial Credit');
+
+          const card = document.createElement('div');
+          card.className = `feedback-item ${stateClass}`;
+          card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <strong>Question ${index + 1} (${stateText})</strong>
+            <span style="font-weight:700; color:var(--accent)">Score: ${evalObj.score_awarded}</span>
+          </div>
+          <p style="font-size:0.95rem; margin-bottom:12px; font-weight:600;">${qOriginal.question}</p>
+          <div style="font-size:0.85rem; margin-bottom:6px;"><strong>Your Answer:</strong> ${evalObj.student_answer || '(No Answer)'}</div>
+          <div style="font-size:0.85rem; margin-bottom:10px;"><strong>Correct Answer:</strong> ${evalObj.correct_answer}</div>
+          <div style="font-size:0.8rem; background-color:var(--bg-secondary); padding:10px; border-radius:6px;">
+            <strong>AI Feedback:</strong> ${evalObj.feedback}
+          </div>
+        `;
+          reviewBox.appendChild(card);
+        });
+
+        addActivityLog(`Completed Mock Test evaluation. Score: ${data.score}/${data.total_questions}`);
+        updateProgressCharts();
+      } catch (e) {
+        showToast("Evaluation failed", "error");
+        exitMockQuiz();
+      }
+    }
+
+    function exitMockQuiz() {
+      if (mockQuizTimerInterval) clearInterval(mockQuizTimerInterval);
+      document.getElementById('mock-session-container').classList.remove('active');
+      document.getElementById('mock-results-container').style.display = 'none';
+      document.getElementById('mock-setup-container').style.display = 'block';
+    }
+
+    // ----------------------------------------------------
+    // 6. FLASHCARDS CONTROLS
+    // ----------------------------------------------------
+    async function generateFlashcards() {
+      const topic = document.getElementById('flash-topic').value || 'Operating Systems';
+      const notes = document.getElementById('flash-notes').value;
+
+      showToast("Generating AI flashcards...", "info");
+
+      try {
+        const data = await apiCall('/api/flashcards/generate', {
+          topic: topic,
+          notes: notes
+        });
+
+        if (data.flashcards && data.flashcards.length > 0) {
+          // Tag card fields
+          appState.flashcards = data.flashcards.map((card, index) => ({
+            ...card,
+            id: `fc_${Date.now()}_${index}`,
+            bookmarked: false,
+            learned: false,
+            subject: topic
+          }));
+
+          currentFlashcardIdx = 0;
+          saveStateToStorage();
+          syncUIState();
+          showToast("Flashcards loaded!", "success");
+          addActivityLog(`Created Flashcard deck for "${topic}"`);
+        }
+      } catch (e) {
+        showToast("Flashcard creation failed", "error");
+      }
+    }
+
+    function loadActiveFlashcard() {
+      const cards = getFilteredFlashcards();
+      const countSpan = document.getElementById('flashcard-deck-idx');
+
+      if (cards.length === 0) {
+        countSpan.innerText = '0 of 0 cards';
+        document.getElementById('flashcard-q-text').innerText = 'No flashcards available matching filters.';
+        document.getElementById('flashcard-a-text').innerText = 'Generate cards or modify your filter settings.';
+        document.getElementById('flashcard-key-pts').innerText = 'None';
+        document.getElementById('flashcard-example').innerText = 'None';
+        document.getElementById('flashcard-mnemonic').innerText = 'None';
+        return;
+      }
+
+      if (currentFlashcardIdx >= cards.length) {
+        currentFlashcardIdx = 0;
+      }
+
+      const card = cards[currentFlashcardIdx];
+      countSpan.innerText = `${currentFlashcardIdx + 1} of ${cards.length} cards`;
+
+      // Render text front/back
+      document.getElementById('flashcard-q-text').innerText = card.question;
+      document.getElementById('flashcard-a-text').innerText = card.answer;
+      document.getElementById('flashcard-key-pts').innerHTML = card.key_points ? card.key_points.map(pt => `<li>${pt}</li>`).join('') : 'None';
+      document.getElementById('flashcard-example').innerText = card.example || 'None';
+      document.getElementById('flashcard-mnemonic').innerText = card.memory_trick || 'None';
+
+      // Set active controls visual
+      const star = document.getElementById('flashcard-star-icon');
+      star.className = card.bookmarked ? 'fa-solid fa-star' : 'fa-regular fa-star';
+
+      const check = document.getElementById('flashcard-check-icon');
+      check.className = card.learned ? 'fa-solid fa-square-check' : 'fa-regular fa-square-check';
+
+      // Ensure card is flipped front
+      document.getElementById('flashcard-card-obj').classList.remove('flipped');
+    }
+
+    function getFilteredFlashcards() {
+      const filter = document.getElementById('flashcard-filter').value;
+      const query = document.getElementById('flashcard-search').value.toLowerCase();
+
+      let list = appState.flashcards;
+
+      if (filter === 'bookmarked') {
+        list = list.filter(c => c.bookmarked);
+      } else if (filter === 'learned') {
+        list = list.filter(c => c.learned);
+      } else if (filter === 'unlearned') {
+        list = list.filter(c => !c.learned);
+      }
+
+      if (query) {
+        list = list.filter(c => c.question.toLowerCase().includes(query) || c.answer.toLowerCase().includes(query));
+      }
+
+      return list;
+    }
+
+    function flipFlashcard() {
+      document.getElementById('flashcard-card-obj').classList.toggle('flipped');
+    }
+
+    function nextFlashcard() {
+      const cards = getFilteredFlashcards();
+      if (cards.length > 0) {
+        currentFlashcardIdx = (currentFlashcardIdx + 1) % cards.length;
+        loadActiveFlashcard();
+      }
+    }
+
+    function prevFlashcard() {
+      const cards = getFilteredFlashcards();
+      if (cards.length > 0) {
+        currentFlashcardIdx = (currentFlashcardIdx - 1 + cards.length) % cards.length;
+        loadActiveFlashcard();
+      }
+    }
+
+    function shuffleFlashcards() {
+      const list = appState.flashcards;
+      for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+      }
+      currentFlashcardIdx = 0;
+      saveStateToStorage();
+      loadActiveFlashcard();
+      showToast("Deck shuffled", "info");
+    }
+
+    function toggleFlashcardBookmark() {
+      const cards = getFilteredFlashcards();
+      if (cards.length > 0) {
+        const card = cards[currentFlashcardIdx];
+        card.bookmarked = !card.bookmarked;
+        saveStateToStorage();
+        syncUIState();
+        showToast(card.bookmarked ? "Card bookmarked" : "Bookmark removed", "info");
+      }
+    }
+
+    function toggleFlashcardLearned() {
+      const cards = getFilteredFlashcards();
+      if (cards.length > 0) {
+        const card = cards[currentFlashcardIdx];
+        card.learned = !card.learned;
+        saveStateToStorage();
+        syncUIState();
+        showToast(card.learned ? "Marked as Learned" : "Marked as Review", "success");
+      }
+    }
+
+    function filterFlashcards() {
+      currentFlashcardIdx = 0;
+      loadActiveFlashcard();
+    }
+
+    function searchFlashcardsLocal() {
+      currentFlashcardIdx = 0;
+      loadActiveFlashcard();
+    }
+
+    // ----------------------------------------------------
+    // 7. PROGRESS CHART ANALYTICS
+    // ----------------------------------------------------
+    function initializeCharts() {
+      // 1. Weekly Activity Chart
+      const ctxWeekly = document.getElementById('weeklyActivityChart').getContext('2d');
+      weeklyChartRef = new Chart(ctxWeekly, {
+        type: 'bar',
+        data: {
+          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          datasets: [{
+            label: 'Study Hours',
+            data: [0, 0, 0, 0, 0, 0, 0],
+            backgroundColor: '#4f46e5',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, max: 10 } }
+        }
+      });
+
+      // 2. Mock Score Chart
+      const ctxMock = document.getElementById('quizProgressChart').getContext('2d');
+      mockChartRef = new Chart(ctxMock, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Accuracy (%)',
+            data: [],
+            borderColor: '#8b5cf6',
+            tension: 0.3,
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: { y: { min: 0, max: 100 } }
+        }
+      });
+
+      updateProgressCharts();
+    }
+
+    function updateProgressCharts() {
+      if (!weeklyChartRef || !mockChartRef) return;
+
+      // Mock Chart Updates
+      const history = appState.mockHistory;
+      if (history.length > 0) {
+        mockChartRef.data.labels = history.map((h, i) => `Test ${i + 1}`);
+        mockChartRef.data.datasets[0].data = history.map(h => h.accuracy);
+        mockChartRef.update();
+      }
+
+      // Weekly Hours Updates based on intake study hours
+      if (appState.studyPlan) {
+        const studyHrs = parseInt(appState.studentDetails.study_hours) || 4;
+        // distribute study hours weekly
+        weeklyChartRef.data.datasets[0].data = [studyHrs, studyHrs, studyHrs, studyHrs, studyHrs, 0, 0];
+        weeklyChartRef.update();
+      }
+    }
+
+    function initializeHeatmap() {
+      const grid = document.getElementById('progress-heatmap');
+      grid.innerHTML = '';
+
+      // render dummy 35 cell grids representing last 5 weeks
+      for (let i = 0; i < 35; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'heatmap-cell';
+
+        // Randomize activity highlight levels
+        let level = 0;
+        if (appState.studyPlan) {
+          if (i % 7 < 5) level = Math.floor(Math.random() * 3) + 2; // Weekday study
+          if (i % 7 === 5) level = 1; // Saturdays mock
+        }
+        if (level > 0) cell.classList.add(`level-${level}`);
+
+        grid.appendChild(cell);
+      }
+    }
+
+    function loadBadgeCollection() {
+      const container = document.getElementById('badges-container');
+      container.innerHTML = '';
+
+      const badges = [
+        { name: 'Early Bird', desc: 'Started study plan', icon: 'fa-sun', earned: !!appState.studyPlan },
+        { name: 'Ace Quizzer', desc: 'Mock test accuracy > 80%', icon: 'fa-award', earned: appState.mockHistory.some(m => m.accuracy >= 80) },
+        { name: 'Streak Champion', desc: 'Active Study streak', icon: 'fa-fire', earned: appState.streak > 0 },
+        { name: 'Knowledge Keeper', desc: 'Generated flashcards', icon: 'fa-bookmark', earned: appState.flashcards.length > 0 }
+      ];
+
+      badges.forEach(b => {
+        const opacity = b.earned ? '1' : '0.35';
+        const color = b.earned ? 'var(--accent)' : 'var(--text-light)';
+
+        const badge = document.createElement('div');
+        badge.style.cssText = `text-align:center; flex:1 0 110px; opacity:${opacity}; padding:12px; border:1px solid var(--border); border-radius:var(--radius-sm); background-color:var(--bg-secondary);`;
+        badge.innerHTML = `
+        <i class="fa-solid ${b.icon}" style="font-size:2rem; color:${color}; margin-bottom:8px; display:block;"></i>
+        <div style="font-size:0.8rem; font-weight:700;">${b.name}</div>
+        <div style="font-size:0.65rem; color:var(--text-light); margin-top:2px;">${b.desc}</div>
+      `;
+        container.appendChild(badge);
+      });
+    }
+
+    // ----------------------------------------------------
+    // 8. NOTIFICATIONS & REMINDERS LIST
+    // ----------------------------------------------------
+    function loadNotificationsList() {
+      const list = document.getElementById('notifications-alerts-list');
+      list.innerHTML = '';
+
+      if (appState.notifications.length === 0) {
+        list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><p class="empty-state-title">No notifications</p></div>';
+        return;
+      }
+
+      appState.notifications.forEach(n => {
+        const item = document.createElement('div');
+        item.className = 'checklist-item';
+        item.style.cursor = 'default';
+        item.innerHTML = `
+        <div class="circular-progress-circle" style="width:30px; height:30px; font-size:0.8rem;"><i class="fa-solid fa-bell"></i></div>
+        <div class="checklist-item-content">
+          <div class="checklist-item-title">${n.text}</div>
+          <div class="checklist-item-meta"><span>${n.time}</span></div>
+        </div>
+        <button class="clear-history-btn" onclick="removeNotification('${n.id}')">Dismiss</button>
+      `;
+        list.appendChild(item);
+      });
+    }
+
+    function addCustomNotification() {
+      const input = document.getElementById('custom-notif-text');
+      const txt = input.value.trim();
+      if (!txt) return;
+
+      appState.notifications.unshift({
+        id: Date.now().toString(),
+        text: txt,
+        type: 'info',
+        time: 'Just now'
+      });
+      input.value = '';
+      saveStateToStorage();
+      syncUIState();
+      showToast("Reminder scheduled", "success");
+    }
+
+    function removeNotification(id) {
+      appState.notifications = appState.notifications.filter(n => n.id !== id);
+      saveStateToStorage();
+      syncUIState();
+    }
+
+    function clearAllNotifications() {
+      appState.notifications = [];
+      saveStateToStorage();
+      syncUIState();
+      showToast("All notifications dismissed", "info");
+    }
+
+    // ----------------------------------------------------
+    // 9. SETTINGS & PROFILE CONTROLS
+    // ----------------------------------------------------
+    function saveSettingsLocal() {
+      appState.settings.personality = document.getElementById('setting-ai-personality').value;
+      appState.settings.studyMode = document.getElementById('setting-study-mode').value;
+      saveStateToStorage();
+      showToast("Preferences updated", "success");
+    }
+
+    function saveProfileChanges() {
+      const name = document.getElementById('profile-name-input').value || 'Student';
+      const exam = document.getElementById('profile-exam-input').value;
+      const score = document.getElementById('profile-score-input').value;
+
+      appState.studentDetails.name = name;
+      appState.studentDetails.exam_name = exam;
+      appState.studentDetails.targetScore = score;
+
+      saveStateToStorage();
+      syncUIState();
+      showToast("Profile details updated successfully", "success");
+    }
+
+    function resetAllLocalStorage() {
+      if (confirm("Reset SmartPrep AI? This clears streaks, calendars, test history, and custom presets.")) {
+        localStorage.removeItem('auraexam_state');
+        location.reload();
+      }
+    }
+
+    async function resetServerSession() {
+      if (confirm("Reset current Flask session? Chat history on the server will be deleted.")) {
+        await apiCall('/api/reset');
+        showToast("Server session successfully cleared", "success");
+      }
+    }
+
+    // ----------------------------------------------------
+    // 11. GLOBAL SEARCH ENGINE
+    // ----------------------------------------------------
+    function openSearchModal() {
+      document.getElementById('searchOverlay').classList.add('active');
+      document.getElementById('globalSearchInput').focus();
+      runGlobalSearch();
+    }
+
+    function closeSearchModal(event) {
+      if (event === null || event.target.id === 'searchOverlay') {
+        document.getElementById('searchOverlay').classList.remove('active');
+        document.getElementById('globalSearchInput').value = '';
+      }
+    }
+
+    function runGlobalSearch() {
+      const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+      const box = document.getElementById('search-results-box');
+      box.innerHTML = '';
+
+      if (!query) {
+        box.innerHTML = '<div style="text-align:center; color:var(--text-light)">Type search query...</div>';
+        return;
+      }
+
+      const results = [];
+
+      // 1. Search Subjects/Syllabus
+      if (appState.studentDetails.subjects && appState.studentDetails.subjects.toLowerCase().includes(query)) {
+        results.push({
+          category: 'Subject Intake',
+          title: `Subject: ${appState.studentDetails.subjects}`,
+          desc: 'Listed in your student intake configuration.',
+          action: () => switchPage('planner')
+        });
+      }
+
+      // 2. Search Flashcards
+      appState.flashcards.forEach(card => {
+        if (card.question.toLowerCase().includes(query) || card.answer.toLowerCase().includes(query)) {
+          results.push({
+            category: 'Flashcard',
+            title: card.question,
+            desc: card.answer,
+            action: () => { switchPage('flashcards'); loadActiveFlashcard(); }
+          });
+        }
+      });
+
+      // 3. Search Videos
+      appState.recentVideos.forEach(v => {
+        if (v.title.toLowerCase().includes(query) || v.description.toLowerCase().includes(query)) {
+          results.push({
+            category: 'YouTube Course Video',
+            title: v.title,
+            desc: v.description,
+            action: () => { switchPage('videos'); searchVideos(query); }
+          });
+        }
+      });
+
+      // 4. Search Mock Test History
+      appState.mockHistory.forEach((h, index) => {
+        if (h.subject.toLowerCase().includes(query)) {
+          results.push({
+            category: 'Mock Test Evaluation',
+            title: `Mock Quiz ${index + 1} — Score: ${h.score}/${h.total}`,
+            desc: `Completed on ${h.date} with ${h.accuracy}% accuracy`,
+            action: () => switchPage('mock-tests')
+          });
+        }
+      });
+
+      if (results.length === 0) {
+        box.innerHTML = '<div style="text-align:center; color:var(--text-light)">No matches found across resources. Try another term.</div>';
+        return;
+      }
+
+      results.forEach(res => {
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+        item.onclick = () => {
+          closeSearchModal(null);
+          res.action();
+        };
+        item.innerHTML = `
+        <div class="search-result-category">${res.category}</div>
+        <div class="search-result-title">${res.title}</div>
+        <div class="search-result-desc">${res.desc}</div>
+      `;
+        box.appendChild(item);
+      });
+    }
+  </script>
+</body>
+
+</html>
